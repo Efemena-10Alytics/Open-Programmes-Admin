@@ -8,8 +8,8 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Nebiant Admin",
-  description: "Nebiant Admin Dashboard",
+  title: "Open Programmes Admin",
+  description: "Open Programmes Admin Dashboard",
 };
 
 export default function RootLayout({

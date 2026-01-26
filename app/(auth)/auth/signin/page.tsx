@@ -14,7 +14,7 @@ export default async function AuthPage() {
   return (
     <div className="w-full min-h-screen h-full pt-4 lg:pt-4">
     <span className="text-2xl font-semibold mx-8 lg:mx-20">
-      NEBIANT
+      OPEN PROGRAMMES
     </span>
     <div className="h-full flex items-center justify-center mt-36 lg:mt-20">
       <LoginForm />
