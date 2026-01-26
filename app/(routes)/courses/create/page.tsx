@@ -17,7 +17,7 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { useSession } from "next-auth/react";
 
@@ -28,11 +28,14 @@ const formSchema = z.object({
 export default function CreatePage() {
   const router = useRouter();
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  if (session?.accessToken) {
-    setAuthToken(session.accessToken);
-  }
+  // Set auth token when session is available
+  useEffect(() => {
+    if (session?.accessToken) {
+      setAuthToken(session.accessToken);
+    }
+  }, [session?.accessToken]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,10 +47,28 @@ export default function CreatePage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      // Ensure we have a valid session and token before making the request
+      if (!session?.accessToken) {
+        toast.error("You must be logged in to create a course");
+        return;
+      }
+
+      // Set the token again just to be safe
+      setAuthToken(session.accessToken);
+
       const response = await axiosInstance.post("/api/courses", values);
+      toast.success("Course created successfully!");
       router.push(`/courses/${response.data?.data?.id}`);
-    } catch (error) {
-      toast.error("Something went wrong");
+    } catch (error: any) {
+      console.error("Course creation error:", error);
+
+      if (error.response?.status === 403) {
+        toast.error("Authentication failed. Please log out and log in again.");
+      } else if (error.response?.status === 401) {
+        toast.error("Your session has expired. Please log in again.");
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
     }
   }
 
