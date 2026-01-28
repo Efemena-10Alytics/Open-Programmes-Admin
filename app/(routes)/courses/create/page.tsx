@@ -58,7 +58,7 @@ export default function CreatePage() {
 
       const response = await axiosInstance.post("/api/courses", values);
       toast.success("Course created successfully!");
-      router.push(`/courses/${response.data?.data?.id}`);
+      router.push(`/cohort/${response.data?.data?.id}`);
     } catch (error: any) {
       console.error("Course creation error:", error);
 
