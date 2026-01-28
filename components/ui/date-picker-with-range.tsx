@@ -23,14 +23,25 @@ interface DatePickerWithRangeProps {
 export function DatePickerWithRange({
   className,
   onChange,
+  value,
 }: DatePickerWithRangeProps) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
+  const [date, setDate] = React.useState<DateRange | undefined>(value || {
     from: new Date(),
     to: new Date(),
   });
 
   React.useEffect(() => {
-    onChange(date);
+    if (value) {
+      setDate(value);
+    }
+  }, [value]);
+
+  React.useEffect(() => {
+    // Only call onChange if the date actually changed and is different from value
+    // This prevents potential infinite loops if parent updates value on every change
+    if (date !== value) {
+      onChange(date);
+    }
   }, [date, onChange]);
 
   return (

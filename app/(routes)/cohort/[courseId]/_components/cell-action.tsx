@@ -122,53 +122,43 @@ const CellAction = ({ data }: CellActionProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <span
-              className="flex items-center cursor-pointer"
-              onClick={() => {
-                setInitialData(data);
-                setEditModal(true);
-              }}
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Cohort
-            </span>
+          <DropdownMenuItem
+            onClick={() => {
+              setInitialData(data);
+              setEditModal(true);
+            }}
+            className="cursor-pointer"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Cohort
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span
-              className="flex items-center cursor-pointer"
-              onClick={() => setCohortCourseWeekModal(true)}
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Update Cohort Weeks
-            </span>
+          <DropdownMenuItem
+            onClick={() => setCohortCourseWeekModal(true)}
+            className="cursor-pointer"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Update Cohort Weeks
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span
-              className="flex items-center cursor-pointer"
-              onClick={() => setCohortCourseTimetableModal(true)}
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Update Cohort Timetable
-            </span>
+          <DropdownMenuItem
+            onClick={() => setCohortCourseTimetableModal(true)}
+            className="cursor-pointer"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Update Cohort Timetable
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span
-              className="flex items-center cursor-pointer"
-              onClick={() => setBrochureUploadModal(true)}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Onboarding Brochure
-            </span>
+          <DropdownMenuItem
+            onClick={() => setBrochureUploadModal(true)}
+            className="cursor-pointer"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Onboarding Brochure
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span
-              className="flex items-center cursor-pointer text-red-600"
-              onClick={() => setConfirmationModal(true)}
-            >
-              <Trash className="h-4 w-4 mr-2" />
-              Delete
-            </span>
+          <DropdownMenuItem
+            onClick={() => setConfirmationModal(true)}
+            className="cursor-pointer text-red-600 focus:text-red-600"
+          >
+            <Trash className="h-4 w-4 mr-2" />
+            Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
