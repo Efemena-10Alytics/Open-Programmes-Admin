@@ -3,7 +3,7 @@
 import { ConfirmModal } from "@/components/modals/confirm-modal";
 import { Button } from "@/components/ui/button";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
-import { Telescope, Trash } from "lucide-react";
+import { Telescope, Trash, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ const CourseActions = ({
 }: CourseActionsProps) => {
   const router = useRouter();
 
-  
+
   const { data: session } = useSession();
 
   if (session?.accessToken) {
@@ -44,14 +44,22 @@ const CourseActions = ({
 
   return (
     <div className="flex items-center gap-x-2">
-       <Link href={`/courses/${courseId}/weeks`}>
-          <Button>
-            <Telescope className="h-4 w-4 mr-2" />
-            View Weeks
-          </Button>
-        </Link>
+      <Link href={`/cohort/${courseId}`}>
+        <Button>
+          <Users className="h-4 w-4 mr-2" />
+          Create Cohort
+        </Button>
+      </Link>
+
+      <Link href={`/courses/${courseId}/weeks`}>
+        <Button variant="outline">
+          <Telescope className="h-4 w-4 mr-2" />
+          View Weeks
+        </Button>
+      </Link>
+
       <ConfirmModal onConfirm={onDelete}>
-        <Button size={"sm"} disabled={isLoading}>
+        <Button size={"sm"} disabled={isLoading} variant="destructive">
           <Trash className="h-4 w-4" />
         </Button>
       </ConfirmModal>
