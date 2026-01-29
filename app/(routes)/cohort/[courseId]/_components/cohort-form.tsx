@@ -1,176 +1,223 @@
 "use client";
 
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as React from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
-import { axiosInstance, setAuthToken } from "@/utils/axios";
-import { toast } from "sonner";
-import { useSession } from "next-auth/react";
-import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
-import { DateRange } from "react-day-picker";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { axiosInstance } from "@/utils/axios";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CohortType } from "@/types";
 
-interface CohortFormProps {
-  initialData?: CohortType | null;
-  courseId: string;
-  open: boolean;
-  setIsOpen: (open: boolean) => void;
-  setInitialData?: any;
-}
-
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name is required" }),
-  dateRange: z.object({
-    startDate: z
-      .date()
-      .refine((val) => val !== null, { message: "Date is required" }),
-    endDate: z.date().nullable().optional(),
-  }),
+    name: z.string().min(2, {
+        message: "Name must be at least 2 characters.",
+    }),
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+}).refine((data) => {
+    if (data.startDate && data.endDate) {
+        return new Date(data.startDate) < new Date(data.endDate);
+    }
+    return true;
+}, {
+    message: "End date must be after start date",
+    path: ["endDate"],
 });
 
-const CohortForm = ({
-  initialData,
-  courseId,
-  open,
-  setIsOpen,
-  setInitialData,
-}: CohortFormProps) => {
-  const router = useRouter();
+interface CohortFormProps {
+    courseId: string;
+    initialData?: CohortType | null;
+    open: boolean;
+    setIsOpen: (open: boolean) => void;
+    setInitialData?: (data: CohortType | null) => void;
+}
 
-  const { data: session } = useSession();
+export default function CohortForm({
+    courseId,
+    initialData,
+    open,
+    setIsOpen,
+    setInitialData,
+}: CohortFormProps) {
+    const [loading, setLoading] = React.useState(false);
+    const [alert, setAlert] = React.useState<{
+        title: string;
+        description: string;
+        variant: "default" | "destructive";
+    } | null>(null);
 
-  if (session?.accessToken) {
-    setAuthToken(session.accessToken);
-  }
+    const defaultValues = React.useMemo(() => {
+        return initialData
+            ? {
+                name: initialData.name,
+                startDate: initialData.startDate
+                    ? new Date(initialData.startDate).toISOString().split("T")[0]
+                    : "",
+                endDate: initialData.endDate
+                    ? new Date(initialData.endDate).toISOString().split("T")[0]
+                    : "",
+            }
+            : {
+                name: "",
+                startDate: "",
+                endDate: "",
+            };
+    }, [initialData]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: initialData ? initialData?.name : "",
-      dateRange: {
-        startDate: initialData ? initialData?.startDate : new Date(),
-        endDate: initialData ? initialData?.endDate : null,
-      },
-    },
-  });
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues,
+        mode: "onChange",
+    });
 
-  const { isSubmitting, isValid } = form.formState;
+    // Reset form when initialData changes
+    React.useEffect(() => {
+        form.reset(defaultValues);
+    }, [defaultValues, form]);
 
-  const handleDateRangeChange = (dateRange: DateRange | undefined) => {
-    if (dateRange) {
-      //@ts-ignore
-      form.setValue("dateRange.startDate", dateRange?.from);
-      form.setValue("dateRange.endDate", dateRange?.to || null);
-    }
-  };
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        try {
+            setLoading(true);
+            setAlert(null);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      if (initialData) {
-        await axiosInstance.patch(`/api/cohorts/${initialData?.id}`, {
-          name: values.name,
-          startDate: values.dateRange.startDate,
-          endDate: values.dateRange.endDate,
-          courseId,
-        });
-        setInitialData(null);
-        toast.success("Cohort Updated");
-      } else {
-        await axiosInstance.post(`/api/cohorts`, {
-          name: values.name,
-          startDate: values.dateRange.startDate,
-          endDate: values.dateRange.endDate,
-          courseId,
-        });
-        toast.success("Cohort Created");
-      }
-      router.refresh();
-      setIsOpen(false);
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
-  }
+            const payload = {
+                ...values,
+                courseId,
+                startDate: new Date(values.startDate).toISOString(),
+                endDate: new Date(values.endDate).toISOString(),
+            };
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        if (!open && initialData) {
-          setInitialData(null);
+            let response;
+            if (initialData) {
+                response = await axiosInstance.patch(`/api/cohorts/${initialData.id}`, payload);
+            } else {
+                response = await axiosInstance.post(`/api/cohorts`, payload);
+            }
+
+            // Check for 200/201 (Created/OK)
+            if (response.status === 201 || response.status === 200) {
+                setAlert({
+                    title: "Success",
+                    description: initialData
+                        ? "Cohort updated successfully"
+                        : "Cohort created successfully",
+                    variant: "default",
+                });
+
+                setTimeout(() => {
+                    setIsOpen(false);
+                    if (setInitialData) setInitialData(null);
+                    // Reload to refresh the DataTable
+                    window.location.reload();
+                }, 1500);
+            }
+        } catch (error: any) {
+            console.error("Error submitting cohort:", error);
+            setAlert({
+                title: "Error",
+                description: error.response?.data?.error || "Failed to submit cohort",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
         }
-        setIsOpen(false);
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-2xl">
-            {initialData ? "Edit Cohort" : "Create a new Cohort"}
-          </DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4 px-4"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel> Cohort Name </FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g 'xx_month Cohort'" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    };
 
-            <FormField
-              control={form.control}
-              name="dateRange"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel> Date Range </FormLabel>
-                  <FormControl>
-                    <DatePickerWithRange
-                      onChange={handleDateRangeChange}
-                      //@ts-ignore
-                      value={field.value as DateRange | undefined}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setIsOpen(false);
+            if (setInitialData) setInitialData(null);
+            setAlert(null);
+            form.reset();
+        }
+    };
 
-            <div className="flex items-center gap-x-2">
-              <Button type="submit" disabled={!isValid || isSubmitting}>
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+    return (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>{initialData ? "Edit Cohort" : "Create New Cohort"}</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        {alert && (
+                            <Alert variant={alert.variant}>
+                                <AlertTitle>{alert.title}</AlertTitle>
+                                <AlertDescription>{alert.description}</AlertDescription>
+                            </Alert>
+                        )}
 
-export default CohortForm;
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Cohort Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g. Cohort 1 - 2024" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="startDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Start Date</FormLabel>
+                                        <FormControl>
+                                            <Input type="date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="endDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>End Date</FormLabel>
+                                        <FormControl>
+                                            <Input type="date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="flex justify-end pt-4">
+                            <Button type="submit" disabled={loading}>
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {loading ? "Saving..." : initialData ? "Save Changes" : "Create Cohort"}
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
