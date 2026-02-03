@@ -114,7 +114,7 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
             Add Quiz
           </Button>
         </div>
-        <ScrollArea className="h-[400px] bg-sky-700/75 border border-black text-white rounded-md">
+        <ScrollArea className="h-[400px] bg-gray-50 border border-primary text-foreground rounded-md">
           {quizzes?.map((quiz, index) => (
             <div key={quiz?.id} className="mb-3">
               <div className="flex flex-col text-sm p-2">
@@ -141,10 +141,10 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
                   {quiz.answers?.map((answer) => (
                     <span
                       key={answer.id}
-                      className="w-full flex items-center bg-black shadow-sm rounded-lg p-1 text-wrap text-[12px]"
+                      className="w-full flex items-center bg-white border border-gray-200 shadow-sm rounded-lg p-1 text-wrap text-[12px]"
                     >
                       <p className="w-[99%] flex items-center">
-                        <CircleDot className="h-3 w-3 text-white mr-1" />
+                        <CircleDot className="h-3 w-3 text-primary mr-1" />
                         {answer.name}
                       </p>
                       <span className="w-[1%] mr-3">

@@ -137,7 +137,7 @@ export default async function Home() {
                         </CardTitle>
                         <p className="text-xs text-gray-500">Total items</p>
                       </div>
-                      <div className="p-3 rounded-md bg-gray-900">
+                      <div className="p-3 rounded-md bg-primary">
                         <IconComponent className="h-6 w-6 text-white" />
                       </div>
                     </div>
@@ -161,7 +161,7 @@ export default async function Home() {
                     </CardTitle>
                     <p className="text-xs text-gray-500">Revenue tracking</p>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <Currency className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default async function Home() {
                       Real-time monitoring
                     </p>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <CreditCard className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export default async function Home() {
                       Manage student submissions
                     </p>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <FileText className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export default async function Home() {
                     </CardTitle>
                     <p className="text-xs text-gray-500">Manage instructors</p>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <Users className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default async function Home() {
                     </CardTitle>
                     <p className="text-xs text-gray-500">Potential students</p>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <Users className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -284,7 +284,7 @@ export default async function Home() {
                       )}
                     </div>
                   </div>
-                  <div className="p-3 rounded-md bg-gray-900">
+                  <div className="p-3 rounded-md bg-primary">
                     <RefreshCw className="h-6 w-6 text-white" />
                   </div>
                 </div>

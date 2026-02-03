@@ -3,12 +3,12 @@ import { options } from "../../api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import Link from "next/link";
-import { 
-  FileText, 
-  Users, 
-  Download, 
-  Upload, 
-  CheckCircle, 
+import {
+  FileText,
+  Users,
+  Download,
+  Upload,
+  CheckCircle,
   Clock,
   AlertCircle,
   BarChart3
@@ -60,7 +60,7 @@ export default async function ClassroomPage() {
     const response = await axiosInstance.get(`/api/admin/assignments`);
     if (response && response.status === 200) {
       assignments = response.data?.data || [];
-      
+
       // Calculate statistics
       assignments.forEach(assignment => {
         totalSubmissions += assignment._count.submissions;
@@ -100,7 +100,7 @@ export default async function ClassroomPage() {
             </div>
             <Link
               href="/classroom/create-assignment"
-              className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
             >
               <FileText className="h-5 w-5" />
               Create Assignment
@@ -170,7 +170,7 @@ export default async function ClassroomPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Recent Assignments</h2>
           </div>
-          
+
           <div className="divide-y divide-gray-200">
             {assignments.length === 0 ? (
               <div className="px-6 py-12 text-center">
@@ -179,7 +179,7 @@ export default async function ClassroomPage() {
                 <p className="text-gray-500 mb-4">Create your first assignment to get started</p>
                 <Link
                   href="/classroom/create-assignment"
-                  className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center gap-2"
+                  className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
                 >
                   <FileText className="h-5 w-5" />
                   Create Assignment
@@ -198,7 +198,7 @@ export default async function ClassroomPage() {
                           {assignment.cohortCourse.cohort.name}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                         <span className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default async function ClassroomPage() {
                             {assignment.submissions.slice(0, 3).map((submission) => {
                               const status = getSubmissionStatus(submission);
                               const StatusIcon = status.icon;
-                              
+
                               return (
                                 <div
                                   key={submission.id}
@@ -261,7 +261,7 @@ export default async function ClassroomPage() {
                                 </div>
                               );
                             })}
-                            
+
                             {assignment.submissions.length > 3 && (
                               <Link
                                 href={`/classroom/assignments/${assignment.id}`}
@@ -274,11 +274,11 @@ export default async function ClassroomPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center gap-2 ml-6">
                       <Link
                         href={`/classroom/assignments/${assignment.id}`}
-                        className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm"
                       >
                         Manage
                       </Link>
