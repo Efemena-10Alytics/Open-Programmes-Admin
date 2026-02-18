@@ -1,6 +1,7 @@
 export enum UserRole {
   USER = "USER",
   ADMIN = "ADMIN",
+  COURSE_ADMIN = "COURSE_ADMIN",
 }
 
 export type User = {
@@ -95,12 +96,12 @@ export type TimeTable = {
   id?: string;
   name?: string;
   category?:
-    | "LESSON"
-    | "QUIZ"
-    | "ASSESSMENT"
-    | "PROJECT"
-    | "LIVE_CLASS"
-    | "BREAK";
+  | "LESSON"
+  | "QUIZ"
+  | "ASSESSMENT"
+  | "PROJECT"
+  | "LIVE_CLASS"
+  | "BREAK";
   date?: Date;
   courseId?: string;
   createdAt?: Date;
@@ -148,6 +149,7 @@ export type ProjectVideoType = {
   videoUrl?: string;
   thumbnailUrl?: string;
   duration?: string;
+  videoType?: string; // VIMEO | YOUTUBE | UPLOAD | EXTERNAL
   moduleId?: string;
   courseModule?: ModuleType;
   courseId?: string;
@@ -251,12 +253,12 @@ export type CohortCourseTimetable = {
   id?: string;
   name?: string;
   category?:
-    | "LESSON"
-    | "QUIZ"
-    | "ASSESSMENT"
-    | "PROJECT"
-    | "LIVE_CLASS"
-    | "BREAK";
+  | "LESSON"
+  | "QUIZ"
+  | "ASSESSMENT"
+  | "PROJECT"
+  | "LIVE_CLASS"
+  | "BREAK";
   date?: Date;
   cohortCourseId?: string;
 };
@@ -290,7 +292,7 @@ export type PaymentStatusType =
 
 
 
-  export type PaymentPlan =
+export type PaymentPlan =
   | "FULL_PAYMENT"
   | "FIRST_HALF_COMPLETE"
   | "SECOND_HALF_PAYMENT"

@@ -24,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { ArrowLeft, PlusCircle } from "lucide-react";
 import CohortForm from "./cohort-form";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
@@ -80,15 +80,23 @@ export function DataTable<TData, TValue>({
             }
             className="max-w-sm"
           />
-          <Button
-            type="button"
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            <PlusCircle className="h-4 w-4 mr-2" />
-            New Cohort
-          </Button>
+          <div className="flex items-center gap-x-2">
+            <Link href={`/courses/${courseId}`}>
+              <Button type="button" variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Course
+              </Button>
+            </Link>
+            <Button
+              type="button"
+              onClick={() => {
+                setShowModal(true);
+              }}
+            >
+              <PlusCircle className="h-4 w-4 mr-2" />
+              New Cohort
+            </Button>
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -101,9 +109,9 @@ export function DataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}

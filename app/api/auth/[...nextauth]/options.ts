@@ -70,6 +70,13 @@ export const options: NextAuthOptions = {
             .then((response) => response.data?.data);
 
           if (!existingUser?.emailVerified) return false;
+
+          if (
+            existingUser?.role !== UserRole.ADMIN &&
+            existingUser?.role !== UserRole.COURSE_ADMIN
+          ) {
+            return false;
+          }
         } catch (error) {
           console.error("SignIn error:", error);
           return false;
