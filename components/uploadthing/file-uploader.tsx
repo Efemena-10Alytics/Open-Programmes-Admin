@@ -2,13 +2,14 @@
 
 import { FileIcon, X } from "lucide-react";
 import { UploadDropzone } from "@/utils/uploadthing";
+import { OurFileRouter } from "@/app/api/uploadthing/core";
 
 import "@uploadthing/react/styles.css";
 
 interface FileUploadProps {
   onChange: (url?: string) => void;
   value: string;
-  endpoint: "imageUploader";
+  endpoint: keyof OurFileRouter;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({

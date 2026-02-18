@@ -13,23 +13,33 @@ export const ourFileRouter = {
       return { fileUrl: file.url };
     }),
 
+  videoUploader: f({ video: { maxFileSize: "512MB", maxFileCount: 1 } })
+    .middleware(async ({ req }) => {
+      console.log("Middleware for videoUploader");
+      return {};
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Video upload completed:", file.url);
+      return { fileUrl: file.url };
+    }),
+
   courseAttachment: f({
     image: { maxFileSize: "16MB", maxFileCount: 3 },
     video: { maxFileSize: "16MB", maxFileCount: 1 },
     audio: { maxFileSize: "16MB", maxFileCount: 1 },
     pdf: { maxFileSize: "16MB", maxFileCount: 1 },
     text: { maxFileSize: "16MB", maxFileCount: 1 },
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { 
-      maxFileSize: "16MB", 
-      maxFileCount: 1 
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+      maxFileSize: "16MB",
+      maxFileCount: 1
     },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { 
-      maxFileSize: "16MB", 
-      maxFileCount: 1 
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+      maxFileSize: "16MB",
+      maxFileCount: 1
     },
-    "application/vnd.ms-excel": { 
-      maxFileSize: "16MB", 
-      maxFileCount: 1 
+    "application/vnd.ms-excel": {
+      maxFileSize: "16MB",
+      maxFileCount: 1
     }
   })
     .middleware(async ({ req }) => {
