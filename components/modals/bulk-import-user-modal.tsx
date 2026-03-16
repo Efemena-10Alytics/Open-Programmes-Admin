@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Papa from "papaparse";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   userData: z.string().min(1, {
@@ -54,6 +55,7 @@ export function BulkImportUserModal({
   courses: any[];
   cohorts: any[];
 }) {
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [alert, setAlert] = React.useState<{
@@ -230,6 +232,7 @@ export function BulkImportUserModal({
         });
         form.reset();
         setValidationErrors([]);
+        router.refresh();
         setTimeout(() => {
           setOpen(false);
         }, 3000);

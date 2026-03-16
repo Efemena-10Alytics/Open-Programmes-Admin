@@ -13,7 +13,9 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/utils/axios";
+import { toast } from "sonner";
 
 interface SessionFormData {
   title: string;
@@ -24,6 +26,7 @@ interface SessionFormData {
 }
 
 export function SessionForm() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const {
     register,
@@ -47,12 +50,13 @@ export function SessionForm() {
 
     try {
       await axiosInstance.post("/api/sessions", data);
-      alert("Session created successfully!");
+      toast.success("Session created successfully!");
+      router.refresh();
       reset();
       setOpen(false);
     } catch (error) {
       console.error("Error creating session:", error);
-      alert("Failed to create session. Please try again.");
+      toast.error("Failed to create session. Please try again.");
     }
   };
 

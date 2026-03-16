@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -136,6 +137,8 @@ export function AddUserModal({ courses, cohorts }: { courses: any[], cohorts: an
     return errors.length === 0;
   };
 
+  const router = useRouter();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (!validateForm()) {
@@ -159,6 +162,7 @@ export function AddUserModal({ courses, cohorts }: { courses: any[], cohorts: an
           variant: "default"
         });
         form.reset();
+        router.refresh();
         setTimeout(() => {
           setOpen(false);
         }, 2000);

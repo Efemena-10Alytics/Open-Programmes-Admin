@@ -55,6 +55,7 @@ export const CourseForm = ({courseId, setIsOpen, open }: WeekFormProps) => {
       try {
         const response = await axiosInstance.put(`/api/courses/${courseId}`, values);
         toast.success("Course Updated");
+        router.refresh();
         router.push(`/courses/${courseId}/weeks/${response?.data?.data?.id}`);
       } catch (error) {
         toast.error("Something went wrong");

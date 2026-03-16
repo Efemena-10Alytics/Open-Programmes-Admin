@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,12 +26,6 @@ import { axiosInstance } from "@/utils/axios";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-const formSchema = z.object({
-  title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
-  }),
-});
-
 export function AddCourseModal() {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -40,12 +35,20 @@ export function AddCourseModal() {
     variant: "default" | "destructive";
   } | null>(null);
 
+  const formSchema = z.object({
+    title: z.string().min(2, {
+      message: "Title must be at least 2 characters.",
+    }),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
     },
   });
+  
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -61,6 +64,7 @@ export function AddCourseModal() {
           variant: "default"
         });
         form.reset();
+        router.refresh();
         setTimeout(() => {
           setOpen(false);
         }, 2000);

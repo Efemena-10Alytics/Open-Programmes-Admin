@@ -62,6 +62,7 @@ const WeekForm = ({courseId, setIsOpen, open }: WeekFormProps) => {
       try {
         const response = await axiosInstance.post(`/api/courses/${courseId}/weeks`, values);
         toast.success("Week Added");
+        router.refresh();
         router.push(`/courses/${courseId}/weeks/${response?.data?.data?.id}`);
       } catch (error) {
         toast.error("Something went wrong");

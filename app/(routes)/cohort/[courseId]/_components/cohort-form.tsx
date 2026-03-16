@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { axiosInstance } from "@/utils/axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CohortType } from "@/types";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -57,6 +58,7 @@ export default function CohortForm({
     setIsOpen,
     setInitialData,
 }: CohortFormProps) {
+    const router = useRouter();
     const [loading, setLoading] = React.useState(false);
     const [alert, setAlert] = React.useState<{
         title: string;
@@ -121,12 +123,12 @@ export default function CohortForm({
                         : "Cohort created successfully",
                     variant: "default",
                 });
+                
+                router.refresh();
 
                 setTimeout(() => {
                     setIsOpen(false);
                     if (setInitialData) setInitialData(null);
-                    // Reload to refresh the DataTable
-                    window.location.reload();
                 }, 1500);
             }
         } catch (error: any) {
