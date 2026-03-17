@@ -22,9 +22,10 @@ import { Trash } from "lucide-react";
 
 interface CellActionsProp {
   data: User;
+  table?: any;
 }
 
-export function CellActions({ data }: CellActionsProp) {
+export function CellActions({ data, table }: CellActionsProp) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -41,7 +42,13 @@ export function CellActions({ data }: CellActionsProp) {
 
       await axiosInstance.delete(`/api/users/${data.id}`);
 
-      router.refresh();
+      // Call client-side refresh if available
+      if (table?.options?.meta?.refreshData) {
+        table.options.meta.refreshData();
+      } else {
+        router.refresh();
+      }
+
       toast.success("User Deleted.");
     } catch (error) {
       console.log(error);
@@ -49,6 +56,7 @@ export function CellActions({ data }: CellActionsProp) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
+      setOpen(false);
     }
   };
 

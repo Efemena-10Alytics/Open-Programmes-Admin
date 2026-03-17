@@ -59,7 +59,7 @@ const formSchema = z.object({
   }),
 });
 
-export function AddUserModal({ courses, cohorts }: { courses: any[], cohorts: any[] }) {
+export function AddUserModal({ courses, cohorts, onSuccess }: { courses: any[], cohorts: any[], onSuccess?: () => void }) {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [alert, setAlert] = React.useState<{
@@ -162,9 +162,16 @@ export function AddUserModal({ courses, cohorts }: { courses: any[], cohorts: an
           variant: "default"
         });
         form.reset();
-        router.refresh();
+        
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.refresh();
+        }
+
         setTimeout(() => {
           setOpen(false);
+          setAlert(null);
         }, 2000);
       }
     } catch (error: any) {

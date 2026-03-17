@@ -205,6 +205,6 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellActions data={row.original} />,
+    cell: ({ row, table }) => <CellActions data={row.original} table={table} />,
   },
 ];

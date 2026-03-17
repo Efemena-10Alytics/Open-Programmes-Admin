@@ -53,6 +53,7 @@ interface DataTableProps<TData, TValue> {
   onPageChange?: (page: number) => void;
   onLimitChange?: (limit: number) => void;
   loading?: boolean;
+  refreshData?: () => void | Promise<void>;
 }
 
 export function DataTable<TData, TValue>({
@@ -70,6 +71,7 @@ export function DataTable<TData, TValue>({
   onPageChange,
   onLimitChange,
   loading = false,
+  refreshData,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -97,6 +99,9 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     // Disable built-in pagination since we're using server-side pagination
     manualPagination: true,
+    meta: {
+      refreshData,
+    },
   });
 
   return (

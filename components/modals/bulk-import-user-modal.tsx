@@ -51,9 +51,11 @@ const formSchema = z.object({
 export function BulkImportUserModal({
   courses,
   cohorts,
+  onSuccess,
 }: {
   courses: any[];
   cohorts: any[];
+  onSuccess?: () => void;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -232,9 +234,16 @@ export function BulkImportUserModal({
         });
         form.reset();
         setValidationErrors([]);
-        router.refresh();
+        
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.refresh();
+        }
+
         setTimeout(() => {
           setOpen(false);
+          setAlert(null);
         }, 3000);
       }
     } catch (error: any) {
