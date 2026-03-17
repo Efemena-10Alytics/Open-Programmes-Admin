@@ -132,7 +132,7 @@ const CellAction = ({ data }: CellActionProps) => {
             <Pencil className="h-4 w-4 mr-2" />
             Edit Cohort
           </DropdownMenuItem>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             onClick={() => setCohortCourseWeekModal(true)}
             className="cursor-pointer"
           >
@@ -145,7 +145,7 @@ const CellAction = ({ data }: CellActionProps) => {
           >
             <Pencil className="h-4 w-4 mr-2" />
             Update Cohort Timetable
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             onClick={() => setBrochureUploadModal(true)}
             className="cursor-pointer"
