@@ -84,6 +84,7 @@ export type CourseType = {
   course_preview_video?: string;
   course_weeks: CourseWeekType[];
   course_videos: string[]; // Ids of ProjectVideo
+  pricingPlans: CoursePricingPlanType[];
   // purchases: string[]; // Ids of Purchase
   timetable: TimeTable[];
   syllabus?: string;
@@ -285,6 +286,17 @@ export interface Cohort {
   startDate: string;
   endDate?: string;
 }
+
+export type CoursePricingPlanType = {
+  id: string;
+  courseId: string;
+  planType: string;
+  amountPerInstallment: number;
+  installmentsCount: number;
+  discountPrice?: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type PaymentStatusType =
   | "COMPLETE"
