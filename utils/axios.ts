@@ -33,8 +33,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.error("Authentication error:", error.response?.data);
+    if (error.response?.status === 401) {
+      console.error("Session expired or unauthorized. Dispatching logout event.");
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth:unauthorized"));
+      }
+    } else if (error.response?.status === 403) {
+      console.error("Access forbidden:", error.response?.data);
     }
     return Promise.reject(error);
   }
