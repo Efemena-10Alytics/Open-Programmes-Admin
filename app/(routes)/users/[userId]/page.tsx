@@ -1,6 +1,8 @@
 import React from "react";
 import { CourseType, User } from "@/types";
-import { axiosInstance, setAuthToken } from "@/utils/axios";
+import { axiosInstance } from "@/utils/axios";
+import axios from "axios";
+import { APIURL } from "@/utils/api-address";
 import { getServerSession } from "next-auth";
 import { options } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
@@ -20,25 +22,33 @@ export default async function UserPage({ params }: UserPageProps) {
     redirect("/auth/signin");
   }
 
-  setAuthToken(session.accessToken);
+
 
   let user: User | null = null;
   let courses: CourseType[] = [];
 
+  console.log(`👤 [UserPage] Fetching data for userId: ${params.userId}`);
+  console.log(`👤 [UserPage] Session present:`, !!session);
+  console.log(`👤 [UserPage] AccessToken present:`, !!session?.accessToken);
+
   try {
     const [userResponse, coursesResponse] = await Promise.all([
-      axiosInstance.get(`/api/users/${params.userId}`, {
-        headers: { Authorization: `Bearer ${session.accessToken}` }
+      axios.get(`${APIURL}/api/users/${params.userId}`, {
+        headers: { Authorization: `Bearer ${session?.accessToken}` }
       }),
-      axiosInstance.get(`/api/courses`, {
-        headers: { Authorization: `Bearer ${session.accessToken}` }
+      axios.get(`${APIURL}/api/courses`, {
+        headers: { Authorization: `Bearer ${session?.accessToken}` }
       }),
     ]);
 
     user = userResponse.status === 200 ? userResponse.data?.data : null;
     courses = coursesResponse.status === 200 ? coursesResponse.data?.data : [];
   } catch (error: any) {
-    console.error("Failed to fetch data:", error);
+    console.error("❌ Failed to fetch data:", error.message);
+    if (error.response) {
+      console.error("❌ Response Status:", error.response.status);
+      console.error("❌ Response Data:", error.response.data);
+    }
     if (error.response?.status === 401 || error.response?.status === 403) {
       redirect("/auth/signin");
     }
