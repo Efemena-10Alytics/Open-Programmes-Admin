@@ -16,11 +16,12 @@ const axiosInstance: AxiosInstance = axios.create(config);
 // Request interceptor to add auth token to every request
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Get token from the instance's default headers if it exists
-    const token = axiosInstance.defaults.headers.common["Authorization"];
-
-    if (token) {
-      config.headers.Authorization = token;
+    // Only auto-add from defaults if on client and NOT already set
+    if (typeof window !== "undefined") {
+      const token = axiosInstance.defaults.headers.common["Authorization"];
+      if (token && !config.headers.Authorization && !config.headers.authorization) {
+        config.headers.Authorization = token;
+      }
     }
 
     return config;
@@ -37,11 +38,9 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401 || error.response?.status === 403) {
       console.error("Authentication error detected. Signing out...", error.response?.data);
       
-      // Clear the auth token immediately
-      delete axiosInstance.defaults.headers.common["Authorization"];
-      
-      // Trigger NextAuth signout if in browser
+      // Clear the auth token immediately (only on client)
       if (typeof window !== "undefined") {
+        delete axiosInstance.defaults.headers.common["Authorization"];
         signOut({ callbackUrl: "/auth/signin", redirect: true });
       }
     }
@@ -50,12 +49,18 @@ axiosInstance.interceptors.response.use(
 );
 
 const setAuthToken = (token?: string) => {
-  if (token) {
-    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    console.log(`🔐 Auth token set successfully (${typeof window === 'undefined' ? 'Server' : 'Client'})`);
+  // Only set global headers on the client to avoid server-side pollution
+  if (typeof window !== "undefined") {
+    if (token) {
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      console.log(`🔐 Auth token set successfully (Client)`);
+    } else {
+      delete axiosInstance.defaults.headers.common["Authorization"];
+      console.log(`🔓 Auth token removed (Client)`);
+    }
   } else {
-    delete axiosInstance.defaults.headers.common["Authorization"];
-    console.log(`🔓 Auth token removed (${typeof window === 'undefined' ? 'Server' : 'Client'})`);
+    // On server, we just log (or do nothing) because tokens are passed per-request in headers
+    // console.log(`⏩ Skipping setAuthToken on Server (tokens should be passed explicitly)`);
   }
 };
 
