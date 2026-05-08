@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { signOut } from "next-auth/react";
 import { APIURL } from "./api-address";
 
 const config: AxiosRequestConfig = {
@@ -33,13 +34,16 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.error("Session expired or unauthorized. Dispatching logout event.");
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.error("Authentication error detected. Signing out...", error.response?.data);
+      
+      // Clear the auth token immediately
+      delete axiosInstance.defaults.headers.common["Authorization"];
+      
+      // Trigger NextAuth signout if in browser
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("auth:unauthorized"));
+        signOut({ callbackUrl: "/auth/signin", redirect: true });
       }
-    } else if (error.response?.status === 403) {
-      console.error("Access forbidden:", error.response?.data);
     }
     return Promise.reject(error);
   }
