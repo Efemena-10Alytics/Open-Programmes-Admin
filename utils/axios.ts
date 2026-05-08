@@ -52,10 +52,10 @@ axiosInstance.interceptors.response.use(
 const setAuthToken = (token?: string) => {
   if (token) {
     axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    console.log("Auth token set successfully");
+    console.log(`🔐 Auth token set successfully (${typeof window === 'undefined' ? 'Server' : 'Client'})`);
   } else {
     delete axiosInstance.defaults.headers.common["Authorization"];
-    console.log("Auth token removed");
+    console.log(`🔓 Auth token removed (${typeof window === 'undefined' ? 'Server' : 'Client'})`);
   }
 };
 
