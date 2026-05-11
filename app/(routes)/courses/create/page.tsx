@@ -17,7 +17,7 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { useSession } from "next-auth/react";
 

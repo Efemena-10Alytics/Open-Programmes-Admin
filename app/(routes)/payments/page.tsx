@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Search, Download, ArrowUpDown } from "lucide-react";
+import { Search, Download, ArrowUpDown, ShieldCheck } from "lucide-react";
 import { Payment, PaymentStatusType, PaymentPlan } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -35,6 +35,7 @@ import { axiosInstance } from "@/utils/axios";
 import { useRouter } from "next/navigation";
 import { DataTablePagination } from "./_components/pagination";
 import { PaymentStats } from "./_components/stats";
+import { ManualVerifyPaymentModal } from "@/components/modals/manual-verify-payment-modal";
 
 const TOTAL_COURSE_FEE =
   Number(process.env.NEXT_PUBLIC_TOTAL_COURSE_FEE) || 250000;
@@ -72,6 +73,7 @@ function PaymentsLoading() {
 
 function PaymentsContent() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
@@ -218,6 +220,12 @@ function PaymentsContent() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Payment Tracking</h1>
         <div className="flex gap-2">
+          <ManualVerifyPaymentModal
+            courses={courses || []}
+            onSuccess={() =>
+              queryClient.invalidateQueries({ queryKey: ["admin-payments"] })
+            }
+          />
           <Button variant="outline">
             <Download className="mr-2 h-4 w-4" />
             Export

@@ -25,7 +25,7 @@ export default function AdminChangeRequestsPage() {
   };
 
   if (loading) return <div>Loading...</div>;
-
+  {/* lighten */ }
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">Change Requests Management</h1>

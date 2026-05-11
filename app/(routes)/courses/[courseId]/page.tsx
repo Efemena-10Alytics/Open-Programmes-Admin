@@ -19,15 +19,17 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   let course: CourseType = null!;
 
   try {
-    await axiosInstance
-      .get(`/api/courses/${params?.courseId}`)
-      .then((response) => {
-        if (response && response.status === 200) {
-          course = response.data?.data;
-        }
-      });
-  } catch (error) {
+    const response = await axiosInstance.get(`/api/courses/${params?.courseId}`, {
+      headers: { Authorization: `Bearer ${session?.accessToken}` }
+    });
+    if (response && response.status === 200) {
+      course = response.data?.data;
+    }
+  } catch (error: any) {
     console.log("Something went wrong while fetching course:", error);
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      redirect("/auth/signin");
+    }
   }
 
   if (!course) {
