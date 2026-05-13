@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   CircleCheck,
   CircleDot,
@@ -29,12 +29,11 @@ import { useSession } from "next-auth/react";
 import ModuleQuizForm from "./module-quiz-form";
 
 interface ModuleListProps {
-  quizzes: QuizType[];
   courseId: string;
   weekId: string;
 }
 
-const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
+const CourseQuizList = ({ weekId, courseId }: ModuleListProps) => {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -46,6 +45,7 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [initialData, setInitialData] = useState<QuizType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [quizzes, setquizzes] = useState<QuizType[]>([]);
 
   const toggleConfirmModal = () => {
     setShowConfirmModal(!showConfirmModal);
@@ -54,10 +54,14 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axiosInstance.delete(`/api/quiz/${initialData?.id}`);
+      const response = await axiosInstance.delete(
+        `/api/quiz/${initialData?.id}`,
+      );
+      console.log(response);
       toast.success("Quiz deleted");
       setInitialData(null);
-      router.refresh();
+      await fetchQuizzes();
+      setShowConfirmModal(false);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -65,6 +69,27 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
       setIsLoading(false);
     }
   };
+
+  const fetchQuizzes = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await axiosInstance.get(`/api/quiz/week/${weekId}`);
+
+      if (response.status === 200) {
+        setquizzes(response.data?.data || []);
+      }
+    } catch (error) {
+      console.log("Error fetching week quizzes:", error);
+      toast.error("Failed to fetch quizzes");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [weekId]);
+
+  useEffect(() => {
+    fetchQuizzes();
+  }, [fetchQuizzes]);
 
   return (
     <>
@@ -76,6 +101,7 @@ const CourseQuizList = ({ quizzes, weekId, courseId }: ModuleListProps) => {
           setIsOpen={setShowModal}
           courseId={courseId}
           weekId={weekId}
+          onSuccess={fetchQuizzes}
         />
       )}
 

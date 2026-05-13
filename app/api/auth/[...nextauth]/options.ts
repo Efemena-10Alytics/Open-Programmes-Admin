@@ -15,7 +15,10 @@ export const options: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const res = await axios.post(`${APIURL}/api/auth/signin`, credentials);
+          const res = await axios.post(
+            `${APIURL}/api/auth/signin`,
+            credentials,
+          );
           const user = res.data.data;
 
           if (res.status === 200 && user) {
@@ -119,7 +122,10 @@ export const options: NextAuthOptions = {
       if (token.sub && session.user) {
         session.user.id = token.sub;
         session.accessToken = token.accessToken as string;
-        session.user.emailVerified = token.emailVerified as Date | string | null;
+        session.user.emailVerified = token.emailVerified as
+          | Date
+          | string
+          | null;
       }
 
       if (token.role && session.user) {
