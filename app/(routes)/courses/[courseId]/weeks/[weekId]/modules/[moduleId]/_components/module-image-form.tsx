@@ -45,7 +45,7 @@ const ImageForm = ({
     try {
       await axiosInstance.patch(
         `/api/courses/${courseId}/weeks/${weekId}/modules/${moduleId}`,
-        values
+        values,
       );
       toast.success("Module Updated");
       toggleEdit();
@@ -95,16 +95,12 @@ const ImageForm = ({
       {isEditing && (
         <div>
           <FileUpload
-            endpoint="imageUploader"
-            onChange={(url: string | undefined) => {
+            onChange={(name: string | undefined, url: string | undefined) => {
               if (url) {
                 onSubmit({ iconUrl: url });
               }
             }}
           />
-          <div className="text-sm text-muted-foreground mt-4">
-            16:9 aspect ratio recommended
-          </div>
         </div>
       )}
     </div>
