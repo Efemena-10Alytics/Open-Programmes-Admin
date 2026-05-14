@@ -30,11 +30,11 @@ import {
 } from "@/components/ui/select";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { toast } from "sonner";
-import { FileUpload } from "@/components/uploadthing/file-uploader";
 import { ProjectVideoType } from "@/types";
 import { useSession } from "next-auth/react";
 import { Youtube, Video, Link, Upload, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FileUpload } from "@/components/file-upload";
 
 interface WeekFormProps {
   initialData: ProjectVideoType | null;
@@ -205,9 +205,10 @@ const CourseVideoForm = ({
                     <FormLabel>Thumbnail Image</FormLabel>
                     <FormControl>
                       <FileUpload
-                        endpoint="imageUploader"
-                        value={field.value!}
-                        onChange={field.onChange}
+                        key="thumbnailUrl"
+                        onChange={(name, url) => {
+                          field.onChange(url);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -246,11 +247,12 @@ const CourseVideoForm = ({
                     </FormLabel>
                     <FormControl>
                       {selectedVideoType === "UPLOAD" ? (
-                        <FileUpload
-                          endpoint="videoUploader"
-                          value={field.value!}
-                          onChange={field.onChange}
-                        />
+                        // <FileUpload
+                        //   endpoint="videoUploader"
+                        //   value={field.value!}
+                        //   onChange={field.onChange}
+                        // />
+                        <></>
                       ) : (
                         <Input
                           placeholder={activeType?.placeholder || "https://..."}
@@ -303,9 +305,7 @@ const CourseVideoForm = ({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={
-                    !form.getFieldState("title").isDirty || isSubmitting
-                  }
+                  disabled={!form.formState.isDirty || isSubmitting}
                 >
                   {isSubmitting ? "Saving..." : "Save Video"}
                 </Button>
