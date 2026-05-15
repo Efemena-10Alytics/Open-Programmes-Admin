@@ -36,7 +36,10 @@ const WeekImageForm = ({ initialData, courseId, weekId }: ImageFormProps) => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await axiosInstance.patch(`/api/courses/${courseId}/weeks/${weekId}`, values);
+      await axiosInstance.patch(
+        `/api/courses/${courseId}/weeks/${weekId}`,
+        values,
+      );
       toast.success("Week Updated");
       toggleEdit();
       router.refresh();
@@ -47,58 +50,54 @@ const WeekImageForm = ({ initialData, courseId, weekId }: ImageFormProps) => {
 
   return (
     <>
-    <div className="mt-6">
-      <div className="font-medium flex items-center justify-between">
-        Week Image / Icon
-        <Button type="button" onClick={toggleEdit} variant={"ghost"}>
-          {isEditing && <> Cancel </>}
+      <div className="mt-6">
+        <div className="font-medium flex items-center justify-between">
+          Week Image / Icon
+          <Button type="button" onClick={toggleEdit} variant={"ghost"}>
+            {isEditing && <> Cancel </>}
 
-          {!isEditing && !initialData?.iconUrl && (
-            <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add an Image
-            </>
-          )}
+            {!isEditing && !initialData?.iconUrl && (
+              <>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add an Image
+              </>
+            )}
 
-          {!isEditing && initialData?.iconUrl && (
-            <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Edit Image
-            </>
-          )}
-        </Button>
-      </div>
-      {!isEditing &&
-        (!initialData?.iconUrl ? (
-          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-            <ImageIcon className="h-10 w-10 text-slate-500" />
-          </div>
-        ) : (
-          <div className="relative aspect-video mt-2">
-            <Image
-              src={initialData?.iconUrl}
-              alt="upload"
-              fill
-              className="object-cover rounded-md"
-            />
-          </div>
-        ))}
-      {isEditing && (
-        <div>
+            {!isEditing && initialData?.iconUrl && (
+              <>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Edit Image
+              </>
+            )}
+          </Button>
+        </div>
+        {!isEditing &&
+          (!initialData?.iconUrl ? (
+            <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
+              <ImageIcon className="h-10 w-10 text-slate-500" />
+            </div>
+          ) : (
+            <div className="relative aspect-video mt-2">
+              <Image
+                src={initialData?.iconUrl}
+                alt="upload"
+                fill
+                className="object-cover rounded-md"
+              />
+            </div>
+          ))}
+        {isEditing && (
           <FileUpload
-            endpoint="imageUploader"
-            onChange={(url: string | undefined) => {
+            accept="image/*"
+            description="Upload a clear image. 16:9 aspect ratio is recommended."
+            onChange={(name: string | undefined, url: string | undefined) => {
               if (url) {
                 onSubmit({ iconUrl: url });
               }
             }}
           />
-          <div className="text-sm text-muted-foreground mt-4">
-            16:9 aspect ratio recommended
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 };

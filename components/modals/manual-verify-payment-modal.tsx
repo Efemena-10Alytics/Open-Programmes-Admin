@@ -171,7 +171,7 @@ export function ManualVerifyPaymentModal({
               className="font-mono"
             />
             <p className="text-xs text-muted-foreground">
-              Found in the Paystack dashboard or the user's payment URL.
+              Found in the Paystack dashboard or the user&apos;s payment URL.
             </p>
           </div>
 
@@ -189,7 +189,7 @@ export function ManualVerifyPaymentModal({
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Found on the user's profile page in the admin panel.
+              Found on the user&apos;s profile page in the admin panel.
             </p>
           </div>
 

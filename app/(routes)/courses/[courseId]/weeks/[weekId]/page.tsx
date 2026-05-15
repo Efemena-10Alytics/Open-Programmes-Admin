@@ -3,7 +3,7 @@ import {
   FolderCheck,
   LayoutDashboard,
   StretchHorizontal,
-  Puzzle
+  Puzzle,
 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { CourseWeekType, ModuleType, QuizType } from "@/types";
@@ -29,7 +29,6 @@ const WeekIdPage = async ({
 
   let courseWeek: CourseWeekType = null!;
   let weekModules: ModuleType[] = [];
-  let weekQuizzes: QuizType[] = [];
 
   try {
     await axiosInstance
@@ -53,18 +52,6 @@ const WeekIdPage = async ({
       });
   } catch (error) {
     console.log("Error fetching week modules:", error);
-  }
-
-  try {
-    await axiosInstance
-      .get(`/api/quiz/week/${params.weekId}`)
-      .then((response) => {
-        if (response && response.status === 200) {
-          weekQuizzes = response.data?.data;
-        }
-      });
-  } catch (error) {
-    console.log("Error fetching week quizzes:", error);
   }
 
   return (
@@ -122,7 +109,6 @@ const WeekIdPage = async ({
               </div>
               <div className="mt-6">
                 <CourseQuizList
-                  quizzes={weekQuizzes}
                   courseId={params?.courseId}
                   weekId={params?.weekId}
                 />

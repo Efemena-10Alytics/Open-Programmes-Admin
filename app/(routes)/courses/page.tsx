@@ -19,13 +19,17 @@ const CoursesPage = async () => {
   let courses: CourseType[] = [];
 
   try {
-    await axiosInstance.get(`/api/courses`).then((response) => {
-      if (response && response.status === 200) {
-        courses = response.data?.data;
-      }
+    const response = await axiosInstance.get(`/api/courses`, {
+      headers: { Authorization: `Bearer ${session?.accessToken}` }
     });
-  } catch (error) {
+    if (response && response.status === 200) {
+      courses = response.data?.data;
+    }
+  } catch (error: any) {
     console.log("Something went wrong while fetching courses", error);
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      redirect("/auth/signin");
+    }
   }
 
   return (

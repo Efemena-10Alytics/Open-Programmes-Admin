@@ -47,7 +47,7 @@ const AttachmentForm = ({
     try {
       await axiosInstance.post(
         `/api/courses/${courseId}/weeks/${weekId}/attachments`,
-        values
+        values,
       );
       toast.success("Attachment Added");
       toggleEdit();
@@ -61,7 +61,7 @@ const AttachmentForm = ({
     try {
       setDeletingId(id);
       await axiosInstance.delete(
-        `/api/courses/${courseId}/weeks/${weekId}/attachments/${id}`
+        `/api/courses/${courseId}/weeks/${weekId}/attachments/${id}`,
       );
       toast.success("Attachment Deleted");
       router.refresh();
@@ -124,14 +124,12 @@ const AttachmentForm = ({
       {isEditing && (
         <div>
           <FileUpload
-            //ADD TO UPLOAD THING
-            // endpoint="course_week_attachment"
-            endpoint="courseAttachment"
             onChange={(name, url) => {
               if (url) {
                 onSubmit({ name: name!, url: url });
               }
             }}
+            maxFileSizeMB={50}
           />
           <div className="text-sm text-muted-foreground mt-4">
             Add anything your students might need to complete the course.

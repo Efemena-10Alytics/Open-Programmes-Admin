@@ -30,11 +30,11 @@ import {
 } from "@/components/ui/select";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { toast } from "sonner";
-import { FileUpload } from "@/components/uploadthing/file-uploader";
 import { ProjectVideoType } from "@/types";
 import { useSession } from "next-auth/react";
 import { Youtube, Video, Link, Upload, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FileUpload } from "@/components/file-upload";
 
 interface WeekFormProps {
   initialData: ProjectVideoType | null;
@@ -61,22 +61,6 @@ const VIDEO_TYPES = [
     icon: Youtube,
     description: "Paste a YouTube video URL",
     placeholder: "https://www.youtube.com/watch?v=...",
-    inputType: "url",
-  },
-  {
-    value: "UPLOAD",
-    label: "Direct Upload",
-    icon: Upload,
-    description: "Upload a video file directly",
-    placeholder: "",
-    inputType: "upload",
-  },
-  {
-    value: "EXTERNAL",
-    label: "External URL",
-    icon: Link,
-    description: "Any other direct video link (MP4, etc.)",
-    placeholder: "https://example.com/video.mp4",
     inputType: "url",
   },
 ] as const;
@@ -111,7 +95,9 @@ const CourseVideoForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: isAddMode ? "" : initialData?.title,
-      videoType: isAddMode ? "VIMEO" : (initialData as any)?.videoType || "VIMEO",
+      videoType: isAddMode
+        ? "VIMEO"
+        : (initialData as any)?.videoType || "VIMEO",
       videoUrl: isAddMode ? "" : initialData?.videoUrl,
       thumbnailUrl: isAddMode ? "" : initialData?.thumbnailUrl,
       duration: isAddMode ? "" : initialData?.duration,
@@ -127,13 +113,13 @@ const CourseVideoForm = ({
       if (isAddMode) {
         await axiosInstance.post(
           `/api/courses/${courseId}/weeks/${weekId}/modules/${moduleId}/videos`,
-          values
+          values,
         );
         toast.success("Course Video Added");
       } else {
         await axiosInstance.patch(
           `/api/courses/${courseId}/weeks/${weekId}/modules/${moduleId}/videos/${initialData?.id}`,
-          values
+          values,
         );
         toast.success("Course Video Updated");
         setInitialData(null);
@@ -190,7 +176,7 @@ const CourseVideoForm = ({
                               "flex flex-col items-center gap-1.5 p-3 rounded-lg border-2 text-sm font-medium transition-all",
                               isSelected
                                 ? "border-slate-900 bg-slate-900 text-white"
-                                : "border-slate-200 bg-white text-slate-600 hover:border-slate-400"
+                                : "border-slate-200 bg-white text-slate-600 hover:border-slate-400",
                             )}
                           >
                             <Icon className="w-5 h-5" />
@@ -219,9 +205,12 @@ const CourseVideoForm = ({
                     <FormLabel>Thumbnail Image</FormLabel>
                     <FormControl>
                       <FileUpload
-                        endpoint="imageUploader"
-                        value={field.value!}
-                        onChange={field.onChange}
+                        accept="image/*"
+                        description="Upload a clear image. 16:9 aspect ratio is recommended."
+                        key="thumbnailUrl"
+                        onChange={(name, url) => {
+                          field.onChange(url);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -237,7 +226,10 @@ const CourseVideoForm = ({
                   <FormItem>
                     <FormLabel>Video Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Introduction to React Hooks" {...field} />
+                      <Input
+                        placeholder="e.g. Introduction to React Hooks"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -251,15 +243,18 @@ const CourseVideoForm = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      {selectedVideoType === "UPLOAD" ? "Video File" : "Video URL"}
+                      {selectedVideoType === "UPLOAD"
+                        ? "Video File"
+                        : "Video URL"}
                     </FormLabel>
                     <FormControl>
                       {selectedVideoType === "UPLOAD" ? (
-                        <FileUpload
-                          endpoint="videoUploader"
-                          value={field.value!}
-                          onChange={field.onChange}
-                        />
+                        // <FileUpload
+                        //   endpoint="videoUploader"
+                        //   value={field.value!}
+                        //   onChange={field.onChange}
+                        // />
+                        <></>
                       ) : (
                         <Input
                           placeholder={activeType?.placeholder || "https://..."}
@@ -269,12 +264,14 @@ const CourseVideoForm = ({
                     </FormControl>
                     {selectedVideoType === "YOUTUBE" && (
                       <FormDescription className="text-xs">
-                        Supports: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...
+                        Supports: youtube.com/watch?v=..., youtu.be/...,
+                        youtube.com/embed/...
                       </FormDescription>
                     )}
                     {selectedVideoType === "VIMEO" && (
                       <FormDescription className="text-xs">
-                        Supports: vimeo.com/123456789 or player.vimeo.com/video/...
+                        Supports: vimeo.com/123456789 or
+                        player.vimeo.com/video/...
                       </FormDescription>
                     )}
                     <FormMessage />
@@ -310,7 +307,7 @@ const CourseVideoForm = ({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={!form.getFieldState("title").isDirty || isSubmitting}
+                  disabled={!form.formState.isDirty || isSubmitting}
                 >
                   {isSubmitting ? "Saving..." : "Save Video"}
                 </Button>

@@ -34,6 +34,7 @@ interface WeekFormProps {
   courseId: string;
   weekId: string;
   setIsOpen: (open: boolean) => void;
+  onSuccess: () => Promise<void>;
 }
 
 const formSchema = z.object({
@@ -44,7 +45,7 @@ const formSchema = z.object({
         id: z.string().optional(),
         name: z.string().min(1),
         isCorrect: z.boolean(),
-      })
+      }),
     )
     .min(2, { message: "At least 2 answers are required" }),
 });
@@ -56,6 +57,7 @@ const ModuleQuizForm = ({
   weekId,
   setIsOpen,
   open,
+  onSuccess,
 }: WeekFormProps) => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -105,7 +107,7 @@ const ModuleQuizForm = ({
       } else {
         // Create new quiz - first get a module for this week
         const modules = await axiosInstance.get(
-          `/api/courses/${courseId}/weeks/${weekId}/modules`
+          `/api/courses/${courseId}/weeks/${weekId}/modules`,
         );
         if (!modules.data?.data?.length) {
           toast.error("No modules found for this week");
@@ -121,7 +123,8 @@ const ModuleQuizForm = ({
         });
         toast.success("Quiz created");
       }
-      router.refresh();
+      await onSuccess();
+      setInitialData(null);
       setIsOpen(false);
     } catch (error) {
       toast.error("Something went wrong");

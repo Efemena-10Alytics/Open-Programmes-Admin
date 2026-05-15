@@ -26,9 +26,9 @@ import {
 } from "@/components/ui/dialog";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { toast } from "sonner";
-import { FileUpload } from "@/components/uploadthing/file-uploader";
 import { ProjectVideoType } from "@/types";
 import { useSession } from "next-auth/react";
+import { FileUpload } from "@/components/file-upload";
 
 interface WeekFormProps {
   initialData: ProjectVideoType | null;
@@ -43,9 +43,7 @@ interface WeekFormProps {
 const formSchema = z.object({
   title: z.string().min(2, { message: "Title is required" }),
   videoUrl: z.string().min(2, { message: "Video url is required" }).optional(),
-  thumbnailUrl: z
-    .string()
-    .optional(),
+  thumbnailUrl: z.string().optional(),
   duration: z.string().min(2, { message: "Duration is required" }).optional(),
 });
 
@@ -85,13 +83,13 @@ const CourseVideoForm = ({
       if (isAddMode) {
         await axiosInstance.post(
           `/api/courses/${courseId}/weeks/${weekId}/modules/${moduleId}/videos`,
-          values
+          values,
         );
         toast.success("Course Video Added");
       } else {
         await axiosInstance.patch(
           `/api/courses/${courseId}/weeks/${weekId}/modules/${moduleId}/videos/${initialData?.id}`,
-          values
+          values,
         );
         toast.success("Course Video Updated");
         setInitialData(null);
@@ -131,9 +129,12 @@ const CourseVideoForm = ({
                     <FormLabel> Thumbnail </FormLabel>
                     <FormControl>
                       <FileUpload
-                        endpoint="imageUploader"
-                        value={field.value!}
-                        onChange={field.onChange}
+                        key="thumbnailUrl"
+                        accept="image/*"
+                        description="Upload a clear image. 16:9 aspect ratio is recommended."
+                        onChange={(name, url) => {
+                          field.onChange(url);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -187,7 +188,12 @@ const CourseVideoForm = ({
               />
 
               <div className="flex items-center gap-x-2">
-                <Button type="submit" disabled={!form.getFieldState("title").isDirty || isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={
+                    !form.getFieldState("title").isDirty || isSubmitting
+                  }
+                >
                   Save
                 </Button>
               </div>

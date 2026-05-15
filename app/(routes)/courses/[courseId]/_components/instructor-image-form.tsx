@@ -32,7 +32,7 @@ const InstructorImageForm = ({ initialData, courseId }: ImageFormProps) => {
 
   // Initialize Cloudinary upload hook
   const {
-    uploadImage,
+    uploadFile,
     isUploading,
     error: uploadError,
     progress,
@@ -46,7 +46,7 @@ const InstructorImageForm = ({ initialData, courseId }: ImageFormProps) => {
       onProgress: (progress) => {
         console.log(`Upload progress: ${progress}%`);
       },
-    }
+    },
   );
 
   if (session?.accessToken) {
@@ -78,7 +78,7 @@ const InstructorImageForm = ({ initialData, courseId }: ImageFormProps) => {
     }
 
     try {
-      const imageUrl = await uploadImage(imageFile);
+      const imageUrl = await uploadFile(imageFile);
       await onSubmit({ course_instructor_image: imageUrl });
     } catch (error: any) {
       console.error("Upload failed:", error);
@@ -169,10 +169,11 @@ const InstructorImageForm = ({ initialData, courseId }: ImageFormProps) => {
                 />
                 <label
                   htmlFor="instructorImage"
-                  className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer transition-colors ${isUploading
+                  className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer transition-colors ${
+                    isUploading
                       ? "border-gray-300 bg-gray-50 cursor-not-allowed"
                       : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                    }`}
+                  }`}
                 >
                   {isUploading ? (
                     <div className="text-center">
@@ -222,4 +223,3 @@ const InstructorImageForm = ({ initialData, courseId }: ImageFormProps) => {
 };
 
 export default InstructorImageForm;
-
