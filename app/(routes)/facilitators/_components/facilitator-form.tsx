@@ -69,17 +69,17 @@ export function FacilitatorForm({
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    facilitator?.imageUrl || null
+    facilitator?.imageUrl || null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
-    uploadImage,
+    uploadFile,
     isUploading,
     error: uploadError,
   } = useCloudinaryUpload(
     cloudinaryConfig.uploadPreset,
-    cloudinaryConfig.cloudName
+    cloudinaryConfig.cloudName,
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -102,7 +102,7 @@ export function FacilitatorForm({
 
       if (imageFile) {
         try {
-          imageUrl = await uploadImage(imageFile);
+          imageUrl = await uploadFile(imageFile);
         } catch (err) {
           console.error("Failed to upload image:", err);
           toast.error("Failed to upload image");
@@ -117,7 +117,7 @@ export function FacilitatorForm({
       if (facilitator) {
         const response = await axiosInstance.patch(
           `/api/facilitators/${facilitator.id}`,
-          data
+          data,
         );
 
         if (response.status === 200) {
@@ -137,7 +137,7 @@ export function FacilitatorForm({
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(
-        error.response?.data?.message || "An error occurred. Please try again."
+        error.response?.data?.message || "An error occurred. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -160,11 +160,11 @@ export function FacilitatorForm({
     })) || [];
 
   const selectedCourses = courseOptions.filter((course) =>
-    form.watch("courseIds")?.includes(course.value)
+    form.watch("courseIds")?.includes(course.value),
   );
 
   const availableCourses = courseOptions.filter(
-    (course) => !form.watch("courseIds")?.includes(course.value)
+    (course) => !form.watch("courseIds")?.includes(course.value),
   );
 
   const handleAddCourse = (courseId: string) => {
@@ -178,7 +178,7 @@ export function FacilitatorForm({
     const currentCourses = form.getValues("courseIds") || [];
     form.setValue(
       "courseIds",
-      currentCourses.filter((id) => id !== courseId)
+      currentCourses.filter((id) => id !== courseId),
     );
   };
 
@@ -335,7 +335,10 @@ export function FacilitatorForm({
                           </SelectTrigger>
                           <SelectContent>
                             {availableCourses.map((course) => (
-                              <SelectItem key={course.value} value={course.value}>
+                              <SelectItem
+                                key={course.value}
+                                value={course.value}
+                              >
                                 {course.label}
                               </SelectItem>
                             ))}
@@ -378,8 +381,8 @@ export function FacilitatorForm({
             {isSubmitting || isUploading
               ? "Saving..."
               : facilitator
-              ? "Update Facilitator"
-              : "Create Facilitator"}
+                ? "Update Facilitator"
+                : "Create Facilitator"}
           </Button>
         </div>
       </form>

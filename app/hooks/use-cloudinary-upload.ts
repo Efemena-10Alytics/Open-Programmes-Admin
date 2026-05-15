@@ -20,7 +20,7 @@ interface UseCloudinaryUploadOptions {
 }
 
 interface UseCloudinaryUploadReturn {
-  uploadImage: (file: File) => Promise<string>;
+  uploadFile: (file: File) => Promise<string>;
   isUploading: boolean;
   error: string | null;
   progress: number;
@@ -37,7 +37,7 @@ interface UseCloudinaryUploadReturn {
 export const useCloudinaryUpload = (
   uploadPreset: string,
   cloudName: string,
-  options: UseCloudinaryUploadOptions = {}
+  options: UseCloudinaryUploadOptions = {},
 ): UseCloudinaryUploadReturn => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,11 +45,11 @@ export const useCloudinaryUpload = (
   const [cancelTokenSource, setCancelTokenSource] = useState<any>(null);
 
   const {
-    timeout = 60000, 
+    timeout = 60000,
     maxRetries = 2,
     maxFileSizeMB = 15,
     compressBeforeUpload = true,
-    onProgress
+    onProgress,
   } = options;
 
   /**
@@ -79,7 +79,7 @@ export const useCloudinaryUpload = (
           // Creating a canvas to resize the image
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          
+
           if (!ctx) {
             console.warn("Could not get canvas context for image compression");
             resolve(file);
@@ -89,34 +89,34 @@ export const useCloudinaryUpload = (
           // Calculating dimensions with aspect ratio preserved
           let width = img.width;
           let height = img.height;
-          
+
           // Scaling down if needed (to preserve aspect ratio)
           const MAX_WIDTH = 1920;
           const MAX_HEIGHT = 1920;
-          
+
           if (width > MAX_WIDTH) {
             const ratio = MAX_WIDTH / width;
             width = MAX_WIDTH;
             height = height * ratio;
           }
-          
+
           if (height > MAX_HEIGHT) {
             const ratio = MAX_HEIGHT / height;
             height = MAX_HEIGHT;
             width = width * ratio;
           }
-          
+
           // Setting canvas size
           canvas.width = width;
           canvas.height = height;
-          
+
           // Draw image on canvas
           ctx.drawImage(img, 0, 0, width, height);
-          
+
           // Get compressed image
           const quality = 0.85; // Adjust quality (0.7-0.85 is usually good)
           const mimeType = file.type || "image/jpeg";
-          
+
           // Convert canvas to blob
           canvas.toBlob(
             (blob) => {
@@ -125,37 +125,35 @@ export const useCloudinaryUpload = (
                 resolve(file);
                 return;
               }
-              
+
               // Create a new file name
               const newFileName = file.name.replace(
-                /\.[^/.]+$/, 
-                `.${mimeType.split("/")[1]}`
+                /\.[^/.]+$/,
+                `.${mimeType.split("/")[1]}`,
               );
-              
+
               // Create a new File from the blob
-              const compressedFile = new File(
-                [blob], 
-                newFileName, 
-                { type: mimeType }
-              );
-              
+              const compressedFile = new File([blob], newFileName, {
+                type: mimeType,
+              });
+
               console.log(
-                `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`
+                `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`,
               );
-              
+
               resolve(compressedFile);
             },
             mimeType,
-            quality
+            quality,
           );
         };
-        
+
         img.onerror = () => {
           console.warn("Error loading image for compression");
           resolve(file);
         };
       };
-      
+
       reader.onerror = () => {
         console.warn("Error reading file for compression");
         resolve(file);
@@ -177,7 +175,7 @@ export const useCloudinaryUpload = (
    * @param file The file to upload
    * @returns The secure URL of the uploaded image
    */
-  const uploadImage = async (file: File, retryCount = 0): Promise<string> => {
+  const uploadFile = async (file: File, retryCount = 0): Promise<string> => {
     // Validate configuration
     if (!cloudName || cloudName === "your-cloud-name") {
       const errorMsg = "Cloudinary cloud name is not configured";
@@ -218,16 +216,16 @@ export const useCloudinaryUpload = (
         fileSize: `${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`,
         fileType: file.type,
         attempt: retryCount + 1,
-        maxRetries: maxRetries
+        maxRetries: maxRetries,
       });
 
       // Create FormData for the file upload
       const formData = new FormData();
       formData.append("file", fileToUpload);
       formData.append("upload_preset", uploadPreset);
-      
+
       // Log the upload endpoint
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
       console.log("Uploading to:", uploadUrl);
 
       // Create cancel token
@@ -246,12 +244,12 @@ export const useCloudinaryUpload = (
           cancelToken: source.token,
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / (progressEvent.total || 1)
+              (progressEvent.loaded * 100) / (progressEvent.total || 1),
             );
             setProgress(percentCompleted);
             if (onProgress) onProgress(percentCompleted);
-          }
-        }
+          },
+        },
       );
 
       console.log("Cloudinary upload successful:", response.data);
@@ -268,43 +266,48 @@ export const useCloudinaryUpload = (
         throw new Error(errorMsg);
       }
 
-      console.error(`Cloudinary upload error (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
-      
+      console.error(
+        `Cloudinary upload error (attempt ${retryCount + 1}/${maxRetries + 1}):`,
+        error,
+      );
+
       // Check if we should retry
       if (retryCount < maxRetries) {
         console.log(`Retrying upload... (${retryCount + 1}/${maxRetries})`);
         setProgress(0);
-        return uploadImage(file, retryCount + 1);
+        return uploadFile(file, retryCount + 1);
       }
-      
+
       if (axios.isAxiosError(error)) {
         // Handle Axios errors
         const statusCode = error.response?.status;
         const responseData = error.response?.data;
-        
+
         console.error("Axios error details:", {
           status: statusCode,
           data: responseData,
           message: error.message,
         });
-        
+
         let errorMessage = "Error uploading image";
-        
+
         if (error.code === "ECONNABORTED") {
           errorMessage = `Upload timed out after ${timeout / 1000} seconds. Try using a smaller image or check your internet connection.`;
-        } else if (responseData && typeof responseData === 'object') {
-          errorMessage = responseData.error?.message || 
-                         responseData.message || 
-                         `Upload failed (${statusCode}): ${error.message}`;
+        } else if (responseData && typeof responseData === "object") {
+          errorMessage =
+            responseData.error?.message ||
+            responseData.message ||
+            `Upload failed (${statusCode}): ${error.message}`;
         }
-        
+
         setError(errorMessage);
         throw new Error(errorMessage);
       } else {
         // Handle non-Axios errors
-        const errorMessage = error instanceof Error 
-          ? error.message 
-          : "An unexpected error occurred during upload";
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred during upload";
         setError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -314,5 +317,5 @@ export const useCloudinaryUpload = (
     }
   };
 
-  return { uploadImage, isUploading, error, progress, cancelUpload };
+  return { uploadFile, isUploading, error, progress, cancelUpload };
 };

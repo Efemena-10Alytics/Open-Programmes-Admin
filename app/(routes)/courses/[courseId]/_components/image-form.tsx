@@ -31,7 +31,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
 
   // Initialize Cloudinary upload hook
   const {
-    uploadImage,
+    uploadFile,
     isUploading,
     error: uploadError,
     progress,
@@ -45,7 +45,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
       onProgress: (progress) => {
         console.log(`Upload progress: ${progress}%`);
       },
-    }
+    },
   );
 
   if (session?.accessToken) {
@@ -77,7 +77,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
     }
 
     try {
-      const imageUrl = await uploadImage(imageFile);
+      const imageUrl = await uploadFile(imageFile);
       await onSubmit({ imageUrl });
     } catch (error: any) {
       console.error("Upload failed:", error);
@@ -131,7 +131,11 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
           </div>
         ) : (
           <div className="relative aspect-video mt-2">
-             <img src={initialData.imageUrl} alt="Uploaded Image" className="object-cover rounded-md" />
+            <img
+              src={initialData.imageUrl}
+              alt="Uploaded Image"
+              className="object-cover rounded-md"
+            />
           </div>
         ))}
 
