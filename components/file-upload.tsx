@@ -2,23 +2,33 @@
 
 import { cloudinaryConfig } from "@/app/config/cloudinary";
 import { useCloudinaryUpload } from "@/app/hooks/use-cloudinary-upload";
-import { ImageIcon, Loader2, Upload, X } from "lucide-react";
+import { FileIcon, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 interface FileUploadProps {
   onChange: (name?: string, url?: string) => void;
   onCancel?: () => void;
+  accept?: string;
+  maxFileSizeMB?: number;
+  description?: string;
 }
 
-export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+export const FileUpload = ({
+  onChange,
+  onCancel,
+  accept = "*/*",
+  maxFileSizeMB = 25,
+  description,
+}: FileUploadProps) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
-    uploadImage,
+    uploadFile,
     isUploading,
     error: uploadError,
     progress,
@@ -27,41 +37,78 @@ export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
     cloudinaryConfig.uploadPreset,
     cloudinaryConfig.cloudName,
     {
-      maxFileSizeMB: 10,
+      maxFileSizeMB,
       compressBeforeUpload: true,
     },
   );
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const isImage = selectedFile?.type.startsWith("image/");
+
+  const defaultDescription = accept.startsWith("image/")
+    ? "Upload a clear image. PNG, JPG, JPEG or WEBP supported."
+    : accept.startsWith("video/")
+      ? "Upload a video file. MP4, MOV, WEBM and other formats supported."
+      : accept.includes("pdf")
+        ? "Upload a PDF document."
+        : "Upload any supported file type.";
+  const uploadDescription = description || defaultDescription;
+  const uploadLabel = accept.startsWith("image/")
+    ? "Click to choose an image"
+    : accept.startsWith("video/")
+      ? "Click to choose a video"
+      : accept.includes("pdf")
+        ? "Click to choose a PDF"
+        : "Click to choose a file";
+
+  const uploadSubLabel = accept.startsWith("image/")
+    ? "PNG, JPG, JPEG, WEBP supported"
+    : accept.startsWith("video/")
+      ? "MP4, MOV, WEBM and other video formats supported"
+      : accept.includes("pdf")
+        ? "PDF documents supported"
+        : "Images, PDFs, videos, documents, archives, and more";
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (!file) return;
 
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+    setSelectedFile(file);
+
+    if (file.type.startsWith("image/")) {
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl(null);
+    }
   };
 
   const handleRemove = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
 
-    setImageFile(null);
-    setImagePreview(null);
+    setSelectedFile(null);
+    setUploadedUrl(null);
+    setPreviewUrl(null);
     onCancel?.();
   };
 
   const handleUpload = async () => {
-    if (!imageFile) {
-      toast.error("Please select an image first");
+    if (!selectedFile) {
+      toast.error("Please select a file first");
       return;
     }
 
     try {
-      const imageUrl = await uploadImage(imageFile);
-      onChange(imageFile.name, imageUrl);
-      toast.success("Image uploaded successfully");
+      const fileUrl = await uploadFile(selectedFile);
+
+      onChange(selectedFile.name, fileUrl);
+      setUploadedUrl(fileUrl);
+
+      toast.success("File uploaded successfully");
     } catch (error) {
       console.error("Upload failed:", error);
-      toast.error("Failed to upload image. Please try again.");
+      toast.error("Failed to upload file. Please try again.");
     }
   };
 
@@ -69,27 +116,47 @@ export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
     if (isUploading) {
       cancelUpload();
     }
+    setUploadedUrl(null);
     onCancel?.();
   };
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   return (
     <div className="w-full space-y-4 rounded-xl border bg-card p-4 shadow-sm">
-      <div>
-        <p className="text-xs text-muted-foreground">
-          Upload a clear image. 16:9 aspect ratio is recommended.
-        </p>
-      </div>
+      <p className="text-xs text-muted-foreground">{uploadDescription}</p>
 
-      {imagePreview ? (
+      {selectedFile ? (
         <div className="relative overflow-hidden rounded-lg border bg-muted">
-          <div className="relative aspect-video w-full">
-            <Image
-              src={imagePreview}
-              alt="Selected course image"
-              fill
-              className="object-cover"
-            />
-          </div>
+          {isImage && previewUrl ? (
+            <div className="relative aspect-video w-full">
+              <Image
+                src={previewUrl}
+                alt={selectedFile.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex min-h-40 flex-col items-center justify-center gap-3 px-6 py-10 text-center">
+              <div className="rounded-full bg-background p-3 shadow-sm">
+                <FileIcon className="h-8 w-8 text-muted-foreground" />
+              </div>
+
+              <div>
+                <p className="max-w-xs truncate text-sm font-medium">
+                  {selectedFile.name}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {selectedFile.type || "Unknown file type"}
+                </p>
+              </div>
+            </div>
+          )}
 
           {!isUploading && (
             <button
@@ -103,34 +170,32 @@ export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
         </div>
       ) : (
         <label
-          htmlFor="courseImage"
+          htmlFor="fileUpload"
           className="flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/30 px-6 py-10 text-center transition hover:bg-muted/60"
         >
           <div className="mb-3 rounded-full bg-background p-3 shadow-sm">
-            <ImageIcon className="h-7 w-7 text-muted-foreground" />
+            <Upload className="h-7 w-7 text-muted-foreground" />
           </div>
 
-          <p className="text-sm font-medium">Click to choose an image</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            PNG, JPG, JPEG or WEBP up to 10MB
-          </p>
+          <p className="text-sm font-medium">{uploadLabel}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{uploadSubLabel}</p>
         </label>
       )}
 
       <input
         type="file"
-        id="courseImage"
-        accept="image/*"
+        id="fileUpload"
+        accept={accept}
         className="hidden"
-        onChange={handleImageChange}
+        onChange={handleFileChange}
         disabled={isUploading}
       />
 
-      {imageFile && (
+      {selectedFile && (
         <div className="rounded-lg bg-muted/40 p-3 text-sm">
-          <p className="truncate font-medium">{imageFile.name}</p>
+          <p className="truncate font-medium">{selectedFile.name}</p>
           <p className="text-xs text-muted-foreground">
-            {(imageFile.size / 1024 / 1024).toFixed(2)} MB
+            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
           </p>
         </div>
       )}
@@ -153,7 +218,7 @@ export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
         <p className="text-center text-sm text-destructive">{uploadError}</p>
       )}
 
-      {imageFile && (
+      {selectedFile && !uploadedUrl ? (
         <div className="flex gap-2">
           <Button
             type="button"
@@ -169,21 +234,21 @@ export const FileUpload = ({ onChange, onCancel }: FileUploadProps) => {
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
-                Upload Image
+                Upload File
               </>
             )}
           </Button>
 
-          {isUploading ? (
-            <Button type="button" variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-          ) : (
-            <Button type="button" variant="outline" onClick={handleRemove}>
-              Remove
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={isUploading ? handleCancel : handleRemove}
+          >
+            {isUploading ? "Cancel" : "Remove"}
+          </Button>
         </div>
+      ) : (
+        ""
       )}
     </div>
   );

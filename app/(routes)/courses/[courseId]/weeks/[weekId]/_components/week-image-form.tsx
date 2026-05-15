@@ -88,6 +88,8 @@ const WeekImageForm = ({ initialData, courseId, weekId }: ImageFormProps) => {
           ))}
         {isEditing && (
           <FileUpload
+            accept="image/*"
+            description="Upload a clear image. 16:9 aspect ratio is recommended."
             onChange={(name: string | undefined, url: string | undefined) => {
               if (url) {
                 onSubmit({ iconUrl: url });

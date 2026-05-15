@@ -129,6 +129,7 @@ const AttachmentForm = ({
                 onSubmit({ name: name!, url: url });
               }
             }}
+            maxFileSizeMB={50}
           />
           <div className="text-sm text-muted-foreground mt-4">
             Add anything your students might need to complete the course.

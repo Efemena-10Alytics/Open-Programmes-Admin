@@ -100,6 +100,8 @@ const ImageForm = ({
                 onSubmit({ iconUrl: url });
               }
             }}
+            accept="image/*"
+            description="Upload a clear image. 16:9 aspect ratio is recommended."
           />
         </div>
       )}

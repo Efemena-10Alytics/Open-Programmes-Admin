@@ -205,6 +205,8 @@ const CourseVideoForm = ({
                     <FormLabel>Thumbnail Image</FormLabel>
                     <FormControl>
                       <FileUpload
+                        accept="image/*"
+                        description="Upload a clear image. 16:9 aspect ratio is recommended."
                         key="thumbnailUrl"
                         onChange={(name, url) => {
                           field.onChange(url);
