@@ -401,44 +401,65 @@ const UserComponent = ({ data, courses }: UserComponentProps) => {
                     {userCohort.cohort.endDate ? 
                       format(new Date(userCohort.cohort.endDate), "MMM d, yyyy") : "Ongoing"}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Status: {userCohort.isPaymentActive ? "Active" : "Inactive"}
-                  </p>
+                  <div className="flex items-center gap-x-2 mt-1">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Status:</span>
+                    <Badge 
+                      variant={userCohort.isActive ? "default" : "secondary"}
+                      className={`${
+                        userCohort.isActive 
+                          ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-200" 
+                          : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-gray-300"
+                      } font-medium text-xs`}
+                    >
+                      {userCohort.isActive ? "Active" : "Inactive (Archived)"}
+                    </Badge>
+                    {!userCohort.isActive && userCohort.archivedAt && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        (Archived {format(new Date(userCohort.archivedAt), "MMM d, yyyy")})
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Change Cohort
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80">
-                    <div className="space-y-4">
-                      <Select
-                        value={selectedNewCohort}
-                        onValueChange={setSelectedNewCohort}
-                        onOpenChange={() => setSelectedCurrentCohort(userCohort.cohortId)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select new cohort" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableCohorts.map((cohort) => (
-                            <SelectItem key={cohort.id} value={cohort.id}>
-                              {cohort.name} ({cohort.startDate ? format(new Date(cohort.startDate), "MMM yyyy") : "Unknown"})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        onClick={updateCohort}
-                        disabled={isUpdatingCohort || !selectedNewCohort}
-                        className="w-full"
-                      >
-                        {isUpdatingCohort ? "Updating..." : "Update Cohort"}
+                {userCohort.isActive ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Change Cohort
                       </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-4">
+                        <Select
+                          value={selectedNewCohort}
+                          onValueChange={setSelectedNewCohort}
+                          onOpenChange={() => setSelectedCurrentCohort(userCohort.cohortId)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select new cohort" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableCohorts.map((cohort) => (
+                              <SelectItem key={cohort.id} value={cohort.id}>
+                                {cohort.name} ({cohort.startDate ? format(new Date(cohort.startDate), "MMM yyyy") : "Unknown"})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          onClick={updateCohort}
+                          disabled={isUpdatingCohort || !selectedNewCohort}
+                          className="w-full"
+                        >
+                          {isUpdatingCohort ? "Updating..." : "Update Cohort"}
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Badge variant="outline" className="text-gray-400 border-gray-200 dark:text-gray-500 dark:border-gray-700">
+                    Archived
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
