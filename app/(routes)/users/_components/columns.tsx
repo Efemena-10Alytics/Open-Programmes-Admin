@@ -180,7 +180,9 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "cohorts",
     header: () => <span className="font-medium">Cohorts</span>,
     cell: ({ row }) => {
-      const userCohorts = row.original.cohorts || [];
+      const userCohorts = (row.original.cohorts || []).filter(
+        (userCohort) => userCohort.isActive
+      );
       if (userCohorts.length === 0) {
         return <span className="text-sm text-gray-400">None</span>;
       }
