@@ -206,33 +206,31 @@ function DashboardCard({ title, value, subtitle, link, customIcon, isSpecial, ba
   const Icon = customIcon || getCardIcon(title);
   
   return (
-    <Link href={link} className="group">
-      <Card className="h-full border-gray-200 bg-white shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-bl-full transform translate-x-10 -translate-y-10 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-500" />
-        
+    <Link href={link}>
+      <Card className="h-full border border-slate-200 bg-white hover:border-purple-300 transition-colors duration-200">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-1">
-              <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-primary transition-colors">
+              <CardDescription className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                 {title}
               </CardDescription>
-              <CardTitle className={`font-bold text-gray-900 leading-tight ${typeof value === 'string' ? 'text-2xl' : 'text-4xl'}`}>
+              <CardTitle className={`font-bold text-slate-900 leading-tight ${typeof value === 'string' ? 'text-xl' : 'text-3xl'}`}>
                 {value}
               </CardTitle>
             </div>
-            <div className={`p-3 rounded-xl transition-all duration-300 ${isSpecial ? 'bg-primary text-white scale-110 shadow-lg' : 'bg-gray-50 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary'}`}>
-              <Icon className="h-6 w-6" />
+            <div className={`p-2.5 rounded-lg ${isSpecial ? 'bg-purple-100 text-purple-700' : 'bg-slate-50 text-slate-500'}`}>
+              <Icon className="h-5 w-5" />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500 font-medium flex items-center gap-1.5 uppercase tracking-wide">
+            <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
               {subtitle}
-              <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight className="h-3 w-3 text-slate-400" />
             </p>
             {badge && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 uppercase">
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-250 uppercase">
                 {badge}
               </span>
             )}

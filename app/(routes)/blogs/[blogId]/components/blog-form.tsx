@@ -43,7 +43,7 @@ const formSchema = z.object({
   title: z.string().min(1),
   content: z.string().min(1),
   mins_read: z.string().min(1),
-  images: z.object({ url: z.string() }).array(),
+  images: z.object({ url: z.string() }).array().optional().default([]),
 });
 
 interface BlogFormProps {
@@ -95,10 +95,10 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       router.refresh();
       toast.success(toastMessage);
       router.push("/blogs");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-
-      toast.error("Something went wrong.");
+      const message = error.response?.data?.message || error.message || "Something went wrong.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -113,10 +113,10 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       router.refresh();
       router.push(`/blogs`);
       toast.success("Blog deleted.");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-
-      toast.error("Something went wrong");
+      const message = error.response?.data?.message || error.message || "Something went wrong.";
+      toast.error(message);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -163,7 +163,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                 <FormControl>
                   <MultipleFileUpload
                     endpoint="imageUploader"
-                    value={field.value.map(
+                    value={(field.value || []).map(
                       (image: { url: string }) => image.url
                     )}
                     onChange={(urls: string[]) =>
@@ -171,7 +171,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                     }
                     onRemove={(url) =>
                       field.onChange(
-                        field.value.filter((current) => current.url !== url)
+                        (field.value || []).filter((current) => current.url !== url)
                       )
                     }
                   />
