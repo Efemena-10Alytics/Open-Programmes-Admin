@@ -7,9 +7,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-start w-full h-full">
+    <div className="flex items-start justify-start w-full h-full min-h-screen">
       <NavigationBar />
-      <div className="w-full px-8">
+      <div className="flex-1 ml-64 px-8 py-6 bg-slate-50 min-h-screen">
       {children}
       </div>
     </div>
