@@ -28,7 +28,7 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   } catch (error: any) {
     console.log("Something went wrong while fetching course:", error);
     if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/auth/signin");
+      redirect("/api/auth/logout");
     }
   }
 

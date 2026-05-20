@@ -106,7 +106,7 @@ export default async function Home() {
   } catch (error: any) {
     console.error("Dashboard data fetch error:", error.message);
     if (error.response?.status === 401 || error.response?.status === 403) {
-      return redirect("/auth/signin");
+      return redirect("/api/auth/logout");
     }
   }
 

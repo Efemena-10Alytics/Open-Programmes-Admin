@@ -38,7 +38,7 @@ const CohortCourseIdPage = async ({ params }: CohortCourseIdPageProps) => {
   } catch (error: any) {
     console.log("Something went wrong while fetching cohorts", error);
     if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/auth/signin");
+      redirect("/api/auth/logout");
     }
   }
 
