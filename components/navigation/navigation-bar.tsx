@@ -98,7 +98,7 @@ export function NavigationBar() {
     <aside className="fixed inset-y-0 left-0 z-30 flex h-full w-64 flex-col bg-white text-slate-800 border-r border-slate-200">
       {/* Brand Header */}
       <div className="flex h-16 items-center px-6 border-b border-slate-200">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center gap-2.5">
           <Logo width={135} height={38} color="#0F172A" />
         </Link>
       </div>
@@ -114,16 +114,14 @@ export function NavigationBar() {
           return (
             <Link key={item.href} href={item.href}>
               <div
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
-                  isActive
-                    ? "bg-purple-50 text-purple-700"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors ${isActive
+                  ? "bg-purple-50 text-purple-700"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
               >
                 <item.icon
-                  className={`h-4.5 w-4.5 shrink-0 ${
-                    isActive ? "text-purple-600" : "text-slate-400 group-hover:text-slate-600"
-                  }`}
+                  className={`h-4.5 w-4.5 shrink-0 ${isActive ? "text-purple-600" : "text-slate-400 group-hover:text-slate-600"
+                    }`}
                 />
                 <span>{item.label}</span>
               </div>
@@ -143,20 +141,12 @@ export function NavigationBar() {
               {session?.user?.name || "Administrator"}
             </span>
             <span className="truncate text-[10px] text-slate-500 mt-0.5">
-              {session?.user?.email || "admin@10alytics.com"}
+              {session?.user?.email}
             </span>
           </div>
         </div>
 
         <div className="mt-3 flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => window.open(process.env.NEXT_PUBLIC_CLIENT_URL || "https://10alytics.org")}
-            className="flex-1 justify-center gap-1.5 h-8 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 rounded-lg"
-          >
-            <Globe className="h-3.5 w-3.5" />
-            <span>Site</span>
-          </Button>
 
           <Button
             variant="ghost"
