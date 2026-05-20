@@ -25,7 +25,7 @@ import { Logo } from "../logo";
 const navItems = [
   {
     label: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -98,7 +98,7 @@ export function NavigationBar() {
     <aside className="fixed inset-y-0 left-0 z-30 flex h-full w-64 flex-col bg-white text-slate-800 border-r border-slate-200">
       {/* Brand Header */}
       <div className="flex h-16 items-center px-6 border-b border-slate-200">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
           <Logo width={135} height={38} color="#0F172A" />
         </Link>
       </div>
@@ -107,8 +107,8 @@ export function NavigationBar() {
       <nav className="flex-1 space-y-1 px-4 py-4 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
 
           return (

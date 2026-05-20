@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { options } from "../api/auth/[...nextauth]/options";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import axios from "axios";
 import { APIURL } from "@/utils/api-address";
@@ -19,13 +18,11 @@ import {
   Activity,
   ShoppingBag,
   Target,
-  Zap,
-  RefreshCw,
-  Currency,
   ArrowRight,
   GraduationCap,
   LayoutDashboard,
   BookOpen,
+  RefreshCw,
 } from "lucide-react";
 import { SessionForm } from "@/components/modals/sessionForm";
 
@@ -59,8 +56,8 @@ const getCardIcon = (title: string) => {
   return iconMap[key] || iconMap.default;
 };
 
-export default async function Home() {
-  const session = await getServerSession(options);
+export default async function DashboardPage() {
+  const session = await getServerSession();
 
   if (!session?.accessToken) {
     return redirect("/auth/signin");
@@ -84,11 +81,10 @@ export default async function Home() {
     ]);
 
     if (overviewRes.status === 200) {
-      overviewData = overviewRes.data?.data;
+      overviewData = overviewRes.data?.data || [];
     }
 
     if (facilitatorsRes.status === 200) {
-      // Correctly fetch real facilitator count from its own API
       facilitatorsCount = facilitatorsRes.data?.data?.length || 0;
     }
 
@@ -96,7 +92,7 @@ export default async function Home() {
       programLeadsCount = leadsRes.data?.data.reduce(
         (sum: number, item: { _count: { programType: number } }) => sum + item._count.programType,
         0
-      );
+      ) || 0;
     }
 
     if (crRes.status === 200) {

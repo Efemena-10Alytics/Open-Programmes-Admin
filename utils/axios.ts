@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/auth-client";
 import { APIURL } from "./api-address";
 
 const config: AxiosRequestConfig = {

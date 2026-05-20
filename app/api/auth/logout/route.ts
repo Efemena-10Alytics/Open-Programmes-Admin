@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const cookieStore = cookies();
   
-  // Delete all next-auth related cookies
+  // Delete all auth related cookies
+  cookieStore.delete("admin_session");
   cookieStore.delete("next-auth.session-token");
   cookieStore.delete("__Secure-next-auth.session-token");
   cookieStore.delete("next-auth.callback-url");
