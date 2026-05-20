@@ -49,7 +49,7 @@ const UsersPage = async () => {
   } catch (error: any) {
     console.error("Error fetching data", error);
     if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/auth/signin");
+      redirect("/api/auth/logout");
     }
   }
 

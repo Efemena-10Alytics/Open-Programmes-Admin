@@ -50,7 +50,7 @@ export default async function UserPage({ params }: UserPageProps) {
       console.error("❌ Response Data:", error.response.data);
     }
     if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/auth/signin");
+      redirect("/api/auth/logout");
     }
   }
 
