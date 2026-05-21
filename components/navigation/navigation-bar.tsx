@@ -140,7 +140,10 @@ export function NavigationBar() {
             <span className="truncate text-xs font-semibold text-slate-800 leading-tight">
               {session?.user?.name || "Administrator"}
             </span>
-            <span className="truncate text-[10px] text-slate-500 mt-0.5">
+            <span 
+              suppressHydrationWarning
+              className="truncate text-[10px] text-slate-500 mt-0.5"
+            >
               {session?.user?.email}
             </span>
           </div>

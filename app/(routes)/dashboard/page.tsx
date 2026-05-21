@@ -4,6 +4,13 @@ import { APIURL } from "@/utils/api-address";
 import { SessionExpiredError } from "@/components/session-error";
 import Link from "next/link";
 import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import {
   Users,
   FileText,
   BarChart3,

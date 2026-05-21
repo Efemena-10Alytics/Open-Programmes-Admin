@@ -3,26 +3,23 @@ import { CourseType, User } from "@/types";
 import { axiosInstance } from "@/utils/axios";
 import axios from "axios";
 import { APIURL } from "@/utils/api-address";
-import { getServerSession } from "next-auth";
-import { options } from "@/app/api/auth/[...nextauth]/options";
-import { redirect } from "next/navigation";
+import { getServerSession } from "@/lib/auth-server";
 import UserComponent from "./_components/user-components";
 import { EngagementTabs } from "./_components/engagement-tabs";
-import Image from "next/image";
+import { SessionExpiredError } from "@/components/session-error";
 
 interface UserPageProps {
   params: {
     userId: string;
   };
 }
+
 export default async function UserPage({ params }: UserPageProps) {
-  const session = await getServerSession(options);
+  const session = await getServerSession();
 
   if (!session?.accessToken) {
-    redirect("/auth/signin");
+    return <SessionExpiredError />;
   }
-
-
 
   let user: User | null = null;
   let courses: CourseType[] = [];
@@ -49,9 +46,7 @@ export default async function UserPage({ params }: UserPageProps) {
       console.error("❌ Response Status:", error.response.status);
       console.error("❌ Response Data:", error.response.data);
     }
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/api/auth/logout");
-    }
+    // Don't redirect on errors - continue with null data
   }
 
 
