@@ -1,22 +1,21 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { options } from "@/app/api/auth/[...nextauth]/options";
+import { getServerSession } from "@/lib/auth-server";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { UsersClient } from "./_components/users-client";
 import { Separator } from "@/components/ui/separator";
+import { SessionExpiredError } from "@/components/session-error";
 import { Loader2 } from "lucide-react";
 
 const UsersPage = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession();
 
+  // Middleware protects this page, but check anyway for safety
   if (!session?.accessToken) {
-    redirect("/auth/signin");
+    return <SessionExpiredError />;
   }
 
-  if (session?.accessToken) {
-    setAuthToken(session?.accessToken);
-  }
+  // Set token for axios requests
+  setAuthToken(session?.accessToken);
 
   let courses: any[] = [];
   let cohorts: any[] = [];
@@ -48,9 +47,9 @@ const UsersPage = async () => {
     }
   } catch (error: any) {
     console.error("Error fetching data", error);
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/api/auth/logout");
-    }
+    // Don't redirect on errors - let page render with empty data
+    courses = [];
+    cohorts = [];
   }
 
   return (

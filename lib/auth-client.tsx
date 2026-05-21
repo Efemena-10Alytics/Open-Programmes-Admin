@@ -1,5 +1,7 @@
 "use client";
 
+import { setAuthToken } from "@/utils/axios";
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

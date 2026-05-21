@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth";
-import { options } from "../../api/auth/[...nextauth]/options";
-import { redirect } from "next/navigation";
+import { getServerSession } from "@/lib/auth-server";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -8,17 +6,16 @@ import Link from "next/link";
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/colums";
 import { Facilitator } from "@/types";
+import { SessionExpiredError } from "@/components/session-error";
 
 export default async function FacilitatorsPage() {
-  const session = await getServerSession(options);
+  const session = await getServerSession();
 
   if (!session?.accessToken) {
-    return redirect("/auth/signin");
+    return <SessionExpiredError />;
   }
 
-  if (session?.accessToken) {
-    setAuthToken(session?.accessToken);
-  }
+  setAuthToken(session?.accessToken);
 
   let facilitators: Facilitator[] = [];
 
@@ -29,6 +26,7 @@ export default async function FacilitatorsPage() {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    // Don't redirect on error - continue with empty data
   }
 
   return (

@@ -1,15 +1,9 @@
-import { getServerSession } from "next-auth";
 import { LoginForm } from "../(components)/auth-form";
-import { options } from "@/app/api/auth/[...nextauth]/options";
-import { redirect } from "next/navigation";
 import { Logo } from "@/components/logo";
 
 export default async function AuthPage() {
-  const session = await getServerSession(options);
-
-  if (session?.accessToken) {
-    return redirect("/dashboard");
-  }
+  // Just render the login form - don't redirect here
+  // Middleware will handle redirects if session exists
 
   return (
     <div className="relative w-full min-h-screen bg-white text-slate-900 overflow-hidden font-sans flex flex-col">

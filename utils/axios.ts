@@ -36,12 +36,15 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.error("Authentication error detected. Signing out...", error.response?.data);
+      console.error("Authentication error detected:", error.response?.data);
       
-      // Clear the auth token immediately (only on client)
+      // Clear the auth token (only on client)
       if (typeof window !== "undefined") {
         delete axiosInstance.defaults.headers.common["Authorization"];
-        signOut({ callbackUrl: "/auth/signin", redirect: true });
+        // Clear session cookie
+        document.cookie = "admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        // Don't auto-redirect - let the page handle it with error UI
+        // Components can use the error to show a message and optionally redirect
       }
     }
     return Promise.reject(error);

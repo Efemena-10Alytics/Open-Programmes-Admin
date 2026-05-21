@@ -1,20 +1,21 @@
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/colums";
-import { redirect } from "next/navigation";
 import { CourseType } from "@/types";
-import { getServerSession } from "next-auth";
-import { options } from "@/app/api/auth/[...nextauth]/options";
+import { getServerSession } from "@/lib/auth-server";
 import { axiosInstance, setAuthToken } from "@/utils/axios";
 import Heading from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { AddCourseModal } from "@/components/modals/add-new-course-modal";
+import { SessionExpiredError } from "@/components/session-error";
 
 const CoursesPage = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession();
 
   if (!session?.accessToken) {
-    redirect("/auth/signin");
+    return <SessionExpiredError />;
   }
+
+  setAuthToken(session?.accessToken);
 
   let courses: CourseType[] = [];
 
@@ -27,9 +28,8 @@ const CoursesPage = async () => {
     }
   } catch (error: any) {
     console.log("Something went wrong while fetching courses", error);
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      redirect("/auth/signin");
-    }
+    // Don't redirect on errors - let page render with empty data
+    courses = [];
   }
 
   return (

@@ -1,14 +1,7 @@
 import { getServerSession } from "@/lib/auth-server";
-import { redirect } from "next/navigation";
 import axios from "axios";
 import { APIURL } from "@/utils/api-address";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
+import { SessionExpiredError } from "@/components/session-error";
 import Link from "next/link";
 import {
   Users,
@@ -59,8 +52,9 @@ const getCardIcon = (title: string) => {
 export default async function DashboardPage() {
   const session = await getServerSession();
 
+  // If no session, render error state (middleware will protect this anyway but handle gracefully)
   if (!session?.accessToken) {
-    return redirect("/auth/signin");
+    return <SessionExpiredError />;
   }
 
   let overviewData: overviewType[] = [];
@@ -101,9 +95,10 @@ export default async function DashboardPage() {
     }
   } catch (error: any) {
     console.error("Dashboard data fetch error:", error.message);
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      return redirect("/api/auth/logout");
-    }
+    // Don't redirect on auth errors - show error state instead
+    // Axios interceptor will handle global 401/403 on client-side requests
+    // For now, continue with empty data arrays
+    overviewData = [];
   }
 
   return (

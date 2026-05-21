@@ -44,34 +44,34 @@ export function LoginForm() {
     },
   });
 
-const handleSubmit = async (values: z.infer<typeof LoginSchema>) => {
-  setIsProcessing(true);
-  try {
-    const response = await axios.post(`${APIURL}/api/auth/signin`, values);
-    const data = response?.data?.data;
-    const token = data?.access_token;
-    if (token) {
-      // Set cookie for server-side session
-      const sessionObj = JSON.stringify({ accessToken: token, user: {} });
-      document.cookie = `admin_session=${encodeURIComponent(sessionObj)}; path=/; max-age=${30 * 24 * 60 * 60}`;
-      setAuthToken(token);
-      toast.success("Signin Successful!");
-      return (window.location.href = "/dashboard");
-    }
-    // If we reach here, authentication failed (invalid credentials or user not found)
-    toast.error("Invalid email or password. Please try again.");
-  } catch (error: unknown) {
-    console.error("[AUTH] axios signIn error:", error);
-    // Axios error may have a response with status 401/403
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+  const handleSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.post(`${APIURL}/api/auth/signin`, values);
+      const data = response?.data?.data;
+      const token = data?.access_token;
+      if (token) {
+        // Set cookie for server-side session
+        const sessionObj = JSON.stringify({ accessToken: token, user: {} });
+        document.cookie = `admin_session=${encodeURIComponent(sessionObj)}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        setAuthToken(token);
+        toast.success("Signin Successful!");
+        return (window.location.href = "/dashboard");
+      }
+      // If we reach here, authentication failed (invalid credentials or user not found)
       toast.error("Invalid email or password. Please try again.");
-    } else {
-      toast.error("Something went wrong. Check console for details.");
+    } catch (error: unknown) {
+      console.error("[AUTH] axios signIn error:", error);
+      // Axios error may have a response with status 401/403
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Invalid email or password. Please try again.");
+      } else {
+        toast.error("Invalid Credentials.");
+      }
+    } finally {
+      setIsProcessing(false);
     }
-  } finally {
-    setIsProcessing(false);
-  }
-};
+  };
   return (
     <Card className="w-full max-w-md bg-white/70 backdrop-blur-md border border-slate-100/80 shadow-xl shadow-purple-100/30 rounded-2xl p-2 md:p-4">
       <CardHeader className="space-y-1">
@@ -124,8 +124,8 @@ const handleSubmit = async (values: z.infer<typeof LoginSchema>) => {
                 </FormItem>
               )}
             />
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               disabled={isProcessing}
               className="w-full h-11 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold rounded-xl shadow-md shadow-purple-200 hover:shadow-lg hover:shadow-purple-300 transition-all duration-200 mt-2 hover:translate-y-[-1px] active:translate-y-[0px]"
             >

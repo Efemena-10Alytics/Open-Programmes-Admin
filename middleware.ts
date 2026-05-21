@@ -13,12 +13,10 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/_next/") ||
     pathname.includes(".");
 
+  // Only redirect to signin if accessing protected route without session
+  // Don't redirect back to dashboard from signin - let user stay on signin page
   if (!session && !isPublicPath) {
     return NextResponse.redirect(new URL("/auth/signin", request.url));
-  }
-
-  if (session && pathname === "/auth/signin") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
